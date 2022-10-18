@@ -1,9 +1,9 @@
-package dv.trubnikov.coolometer.messaging
+package dv.trubnikov.coolometer.cloud
 
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.messaging.FirebaseMessaging
-import dv.trubnikov.coolometer.tools.SingleValueFlow
+import dv.trubnikov.coolometer.tools.ReplayValueFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -19,7 +19,7 @@ class CloudTokenProvider @Inject constructor(
     private val firebaseAnalytics: FirebaseAnalytics,
 ) {
     private val tokenScope = CoroutineScope(Dispatchers.IO)
-    private val tokenValue = SingleValueFlow<String>()
+    private val tokenValue = ReplayValueFlow<String>()
 
     init {
         tokenScope.launch {
