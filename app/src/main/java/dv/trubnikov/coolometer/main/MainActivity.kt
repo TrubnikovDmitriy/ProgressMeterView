@@ -1,16 +1,20 @@
 package dv.trubnikov.coolometer.main
 
+import android.graphics.Color
 import android.os.Bundle
-import android.widget.Toast
+import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.github.jinatonic.confetti.CommonConfetti
 import dagger.hilt.android.AndroidEntryPoint
-import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.cloud.CloudMessageQueue
+import dv.trubnikov.coolometer.databinding.ActivityMainBinding
 import dv.trubnikov.coolometer.models.CloudMessage
 import dv.trubnikov.coolometer.models.CloudMessageParser
 import dv.trubnikov.coolometer.tools.assertFail
+import dv.trubnikov.coolometer.tools.reverse
+import dv.trubnikov.coolometer.tools.unsafeLazy
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,24 +28,54 @@ class MainActivity : AppCompatActivity() {
     lateinit var messageQueue: CloudMessageQueue
 
     private val viewModel by viewModels<MainViewModel>()
+    private val viewBinding by unsafeLazy { ActivityMainBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        observeMessageQueue()
+        setContentView(viewBinding.root)
     }
 
     override fun onStart() {
         super.onStart()
+        observeMessageQueue()
         checkForNewMessage()
     }
 
     private fun showConfetti(message: CloudMessage) {
-        Toast.makeText(this, "Конфетти! (${message.score})", Toast.LENGTH_LONG).show()
+        changeSizeOfConfetti()
+        viewBinding.root.post {
+            val colors = intArrayOf(
+                Color.RED,
+                Color.GREEN,
+                Color.BLUE,
+                Color.CYAN,
+                Color.MAGENTA,
+                Color.YELLOW
+            )
+            val confetti = CommonConfetti.rainingConfetti(viewBinding.root, colors)
+
+            confetti.confettiManager
+                .setNumInitialCount(0)
+                .setEmissionDuration(5_000)
+                .setEmissionRate(150f)
+                .enableFadeOut(DecelerateInterpolator().reverse())
+                .setTouchEnabled(true)
+                .setTTL(-1)
+                .animate()
+        }
+    }
+
+    private fun changeSizeOfConfetti() {
+        CommonConfetti.rainingConfetti(viewBinding.root, intArrayOf())
+        val clazz = CommonConfetti::class.java
+        val field = clazz.getDeclaredField("defaultConfettiSize")
+        field.isAccessible = true
+        field.setInt(null, 40)
     }
 
     private fun checkForNewMessage() {
         if (intent.hasExtra(CMS_MARKER_KEY)) {
+            intent.removeExtra(CMS_MARKER_KEY)
             val message = CloudMessageParser.parse(intent)
             if (message != null) {
                 showConfetti(message)

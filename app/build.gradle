@@ -22,10 +22,16 @@ android {
         release {
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -51,6 +57,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'com.google.android.material:material:1.6.1'
+
+    // Third party library for confetti
+    implementation 'com.github.jinatonic.confetti:confetti:1.1.2'
 
     // Logs
     implementation 'com.jakewharton.timber:timber:5.0.1'
