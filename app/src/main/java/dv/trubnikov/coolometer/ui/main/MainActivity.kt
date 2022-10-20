@@ -2,9 +2,6 @@ package dv.trubnikov.coolometer.ui.main
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
-import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +15,7 @@ import dv.trubnikov.coolometer.domain.models.CloudMessageParser
 import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
+import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -34,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel>()
     private val viewBinding by unsafeLazy { ActivityMainBinding.inflate(layoutInflater) }
 
-    private var sign = +1
+    private var sign = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
@@ -46,12 +44,13 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             val random = Random(viewBinding.coolometer.hashCode())
-            viewBinding.coolometer.setOnClickListener {
-                val progress = viewBinding.coolometer.progress
-                if (progress <= 0f || progress >= 1f) {
-                    sign *= -1
+            viewBinding.coolometer.overshootListener = OvershootListener { forward ->
+                if (forward) {
+                    showConfetti(CloudMessage("", "", 150))
                 }
-                viewBinding.coolometer.setProgress(progress + sign * random.nextFloat(), true)
+            }
+            viewBinding.coolometer.setOnClickListener {
+                viewBinding.coolometer.addProgress(sign * random.nextInt(viewBinding.coolometer.maxProgress), true)
             }
         }
     }
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             confetti.confettiManager
                 .setNumInitialCount(0)
                 .setEmissionDuration(5_000)
-                .setEmissionRate(150f)
+                .setEmissionRate(100f)
                 .enableFadeOut(DecelerateInterpolator().reverse())
                 .setTouchEnabled(true)
                 .setTTL(-1)
