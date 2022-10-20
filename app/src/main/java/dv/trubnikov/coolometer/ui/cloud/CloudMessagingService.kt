@@ -19,24 +19,13 @@ class CloudMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var messageQueue: CloudMessageQueue
 
-    override fun onCreate() {
-        Timber.d("KekPek onCreate()")
-        super.onCreate()
-    }
-
     override fun onMessageReceived(message: RemoteMessage) {
-        Timber.d("KekPek onMessageReceived()")
         super.onMessageReceived(message)
         sendMessageToRunningActivity(message)
     }
 
     override fun onNewToken(token: String) {
         tokenAnalytics.updateToken(token)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.d("KekPek onDestroy()")
     }
 
     /**

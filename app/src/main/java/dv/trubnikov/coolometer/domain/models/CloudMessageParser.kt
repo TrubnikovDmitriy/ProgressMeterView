@@ -7,18 +7,18 @@ import timber.log.Timber
 
 object CloudMessageParser {
 
-    private const val TITLE_KEY = "cool_title"
-    private const val TEXT_KEY = "cool_text"
-    private const val SCORE_KEY = "cool_score"
+    private const val EXPLAIN_KEY = "coolometer_explain_key"
+    private const val BUBBLE_KEY = "coolometer_bubble_key"
+    private const val SCORE_KEY = "coolometer_score_key"
 
     fun parse(message: RemoteMessage): CloudMessage? {
-        val title = message.getOrLogError(TITLE_KEY) ?: return null
-        val text = message.getOrLogError(TEXT_KEY) ?: return null
+        val title = message.getOrLogError(EXPLAIN_KEY) ?: return null
+        val text = message.getOrLogError(BUBBLE_KEY) ?: return null
         val scoreString = message.getOrLogError(SCORE_KEY) ?: return null
         val score = parseScoreOrLogError(scoreString) ?: return null
-        return CloudMessage(
-            title = title,
-            text = text,
+        return FirebaseMessage(
+            longMessage = title,
+            shortMessage = text,
             score = score
         )
     }
@@ -29,13 +29,13 @@ object CloudMessageParser {
             Timber.e("Отсутствуют extras у интента [$intent].")
             return null
         }
-        val title = extras.getOrLogError(TITLE_KEY) ?: return null
-        val text = extras.getOrLogError(TEXT_KEY) ?: return null
+        val title = extras.getOrLogError(EXPLAIN_KEY) ?: return null
+        val text = extras.getOrLogError(BUBBLE_KEY) ?: return null
         val scoreString = extras.getOrLogError(SCORE_KEY) ?: return null
         val score = parseScoreOrLogError(scoreString) ?: return null
-        return CloudMessage(
-            title = title,
-            text = text,
+        return FirebaseMessage(
+            longMessage = title,
+            shortMessage = text,
             score = score
         )
     }

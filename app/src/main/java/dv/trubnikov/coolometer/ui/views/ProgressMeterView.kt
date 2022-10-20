@@ -134,8 +134,10 @@ class ProgressMeterView @JvmOverloads constructor(
         }
 
     init {
-        setupVibrationForAfterAnimation()
-        totalProgressAnimator.interpolator = LinearInterpolator()
+        if (!isInEditMode) {
+            setupVibrationForAfterAnimation()
+            totalProgressAnimator.interpolator = LinearInterpolator()
+        }
     }
 
     /**
@@ -385,19 +387,18 @@ class ProgressMeterView @JvmOverloads constructor(
     private fun drawScoreboard(canvas: Canvas) {
         val text = totalProgress.toString()
         digitPaint.getTextBounds(text, 0, text.length, textRect)
-        val oneDigitWidthAdjustment = digitPaint.measureText("0", 0, 1) / 6
         val textWidth = textRect.width()
         val textHeight = textRect.height()
         val scoreboardWidth = textWidth + borderPaint.strokeWidth + textPadding
-        val scoreboardHeight = 2 * (textHeight + nippleRadius + borderPaint.strokeWidth + textPadding)
+        val scoreboardHeight = 2 * (textHeight + nippleRadius + borderPaint.strokeWidth) + textPadding
         rect.left = drawRect.centerX() - scoreboardWidth / 2
         rect.right = drawRect.centerX() + scoreboardWidth / 2
         rect.top = drawRect.centerY() + scoreboardHeight / 2
         rect.bottom = drawRect.centerY() - scoreboardHeight / 2
         canvas.drawRoundRect(rect, textPadding, textPadding, backgroundPaint)
         canvas.drawRoundRect(rect, textPadding, textPadding, borderPaint)
-        val textX = rect.centerX() - textWidth / 2 - oneDigitWidthAdjustment
-        val textY = rect.centerY() - textHeight - borderPaint.strokeWidth / 2 - textPadding / 2
+        val textX = rect.centerX() - textWidth / 2
+        val textY = rect.centerY() - textHeight - borderPaint.strokeWidth / 2 - textPadding / 1.25f
         canvas.withScale(1f, -1f) {
             canvas.drawText(text, textX, -textY, digitPaint)
         }

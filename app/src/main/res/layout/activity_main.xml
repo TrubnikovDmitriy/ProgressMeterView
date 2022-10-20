@@ -8,10 +8,25 @@
     tools:context=".ui.main.MainActivity"
     >
 
+    <TextView
+        android:id="@+id/explainText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:fontFamily="@font/digital_font"
+        android:gravity="center"
+        android:lineSpacingExtra="10sp"
+        android:textSize="30sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/progressMeter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
     <dv.trubnikov.coolometer.ui.views.ProgressMeterView
-        android:id="@+id/coolometer"
+        android:id="@+id/progressMeter"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,10 +43,10 @@
         android:padding="12dp"
         android:shadowColor="@android:color/black"
         android:shadowRadius="12"
-        android:text="Поздравляем!\n+200"
         android:textColor="@android:color/holo_green_light"
-        android:textSize="30sp"
-        app:layout_constraintTop_toBottomOf="@id/coolometer"
+        android:textSize="40sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/progressMeter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />

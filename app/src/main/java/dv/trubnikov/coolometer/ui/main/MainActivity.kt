@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.github.jinatonic.confetti.CommonConfetti
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,12 +13,12 @@ import dv.trubnikov.coolometer.databinding.ActivityMainBinding
 import dv.trubnikov.coolometer.domain.cloud.CloudMessageQueue
 import dv.trubnikov.coolometer.domain.models.CloudMessage
 import dv.trubnikov.coolometer.domain.models.CloudMessageParser
+import dv.trubnikov.coolometer.domain.models.FakeMessage
 import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
 import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
 import javax.inject.Inject
-import kotlin.random.Random
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -32,65 +33,66 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel>()
     private val viewBinding by unsafeLazy { ActivityMainBinding.inflate(layoutInflater) }
 
-    private var sign = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
-        viewBinding.root.post {
-            viewBinding.floatingText.setOnClickListener {
-                viewBinding.floatingText.animateFloating(
-                    viewBinding.root.width.toFloat(),
-                    viewBinding.root.height.toFloat(),
-                )
-            }
-            val random = Random(viewBinding.coolometer.hashCode())
-            viewBinding.coolometer.overshootListener = OvershootListener { forward ->
-                if (forward) {
-                    showConfetti(CloudMessage("", "", 150))
-                }
-            }
-            viewBinding.coolometer.setOnClickListener {
-                viewBinding.coolometer.addProgress(sign * random.nextInt(viewBinding.coolometer.maxProgress), true)
-            }
-        }
+        changeSizeOfConfetti()
+        setupListeners()
     }
 
     override fun onStart() {
         super.onStart()
-        observeMessageQueue()
         checkForNewMessage()
+        observeMessageQueue()
     }
 
-    private fun showConfetti(message: CloudMessage) {
-        changeSizeOfConfetti()
-        viewBinding.root.post {
-            val colors = intArrayOf(
-                Color.RED,
-                Color.GREEN,
-                Color.BLUE,
-                Color.CYAN,
-                Color.MAGENTA,
-                Color.YELLOW
-            )
-            val confetti = CommonConfetti.rainingConfetti(viewBinding.root, colors)
-
-            confetti.confettiManager
-                .setNumInitialCount(0)
-                .setEmissionDuration(5_000)
-                .setEmissionRate(100f)
-                .enableFadeOut(DecelerateInterpolator().reverse())
-                .setTouchEnabled(true)
-                .setTTL(-1)
-                .animate()
+    private fun setupListeners() {
+        viewBinding.progressMeter.overshootListener = OvershootListener { forward ->
+            if (forward) showConfetti()
+        }
+        viewBinding.root.setOnClickListener {
+            handleMessage(FakeMessage())
         }
     }
 
-    private fun changeSizeOfConfetti() {
-        CommonConfetti.rainingConfetti(viewBinding.root, intArrayOf())
-        val clazz = CommonConfetti::class.java
-        val field = clazz.getDeclaredField("defaultConfettiSize")
-        field.isAccessible = true
-        field.setInt(null, 40)
+    private fun handleMessage(message: CloudMessage) {
+        with(viewBinding) {
+            floatingText.text = message.shortMessage
+            floatingText.animateFloating(root.width.toFloat(), progressMeter.bottom.toFloat())
+            explainText.text = message.longMessage
+            explainText.isVisible = true
+            progressMeter.addProgress(message.score, true)
+        }
+    }
+
+    private fun showConfetti() {
+        val colors = intArrayOf(
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE,
+            Color.CYAN,
+            Color.MAGENTA,
+            Color.YELLOW
+        )
+        val confetti = CommonConfetti.rainingConfetti(viewBinding.root, colors)
+
+        confetti.confettiManager
+            .setNumInitialCount(0)
+            .setEmissionDuration(5_000)
+            .setEmissionRate(100f)
+            .enableFadeOut(DecelerateInterpolator().reverse())
+            .setTouchEnabled(true)
+            .setTTL(-1)
+            .animate()
+    }
+
+    private fun observeMessageQueue() {
+        // TODO: replace on repeatOnLifecycle
+        lifecycleScope.launchWhenStarted {
+            messageQueue.messageFlow.collect {
+                handleMessage(it)
+            }
+        }
     }
 
     private fun checkForNewMessage() {
@@ -98,7 +100,7 @@ class MainActivity : AppCompatActivity() {
             intent.removeExtra(CMS_MARKER_KEY)
             val message = CloudMessageParser.parse(intent)
             if (message != null) {
-                showConfetti(message)
+                handleMessage(message)
             } else {
                 val error = IllegalStateException(
                     """
@@ -111,15 +113,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun observeMessageQueue() {
-        lifecycleScope.launchWhenStarted {
-            messageQueue.messageFlow.collect {
-                showConfetti(it)
-            }
-        }
-    }
-
     private fun checkForNotificationPermissions() {
         // TODO: Permissions
+    }
+
+    private fun changeSizeOfConfetti() {
+        CommonConfetti.rainingConfetti(viewBinding.root, intArrayOf())
+        val clazz = CommonConfetti::class.java
+        val field = clazz.getDeclaredField("defaultConfettiSize")
+        field.isAccessible = true
+        field.setInt(null, 40)
     }
 }
