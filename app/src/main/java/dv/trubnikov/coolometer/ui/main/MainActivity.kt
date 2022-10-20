@@ -2,14 +2,17 @@ package dv.trubnikov.coolometer.ui.main
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Window
+import android.view.WindowManager
+import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.github.jinatonic.confetti.CommonConfetti
 import dagger.hilt.android.AndroidEntryPoint
-import dv.trubnikov.coolometer.domain.cloud.CloudMessageQueue
 import dv.trubnikov.coolometer.databinding.ActivityMainBinding
+import dv.trubnikov.coolometer.domain.cloud.CloudMessageQueue
 import dv.trubnikov.coolometer.domain.models.CloudMessage
 import dv.trubnikov.coolometer.domain.models.CloudMessageParser
 import dv.trubnikov.coolometer.tools.assertFail

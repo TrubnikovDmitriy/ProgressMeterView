@@ -6,9 +6,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
+import androidx.core.view.isVisible
 import kotlin.random.Random
 
 class FloatingTextView @JvmOverloads constructor(
@@ -21,12 +23,16 @@ class FloatingTextView @JvmOverloads constructor(
 
     fun animateFloating(parentWidth: Float, parentHeight: Float) {
         val baseDuration = 4_000L
-        val totalDuration = (4 + random.nextFloat() * 3) * baseDuration // base * (4..7)
+        val totalDuration = (2 + random.nextFloat() * 3) * baseDuration // base * (3..6)
         val swingDuration = (1 + random.nextFloat() * 0.3) * baseDuration // base * (1,0..1,3)
+        val appearDuration = baseDuration / 2f
 
-        val lift = ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, 0f, -parentHeight).apply {
+        val lift = ObjectAnimator.ofFloat(
+            this, View.TRANSLATION_Y,
+            0f,
+            -parentHeight
+        ).apply {
             interpolator = DecelerateInterpolator()
-            interpolator = BounceInterpolator()
             duration = totalDuration.toLong()
         }
 
@@ -53,18 +59,29 @@ class FloatingTextView @JvmOverloads constructor(
             setCurrentFraction(0.5f)
         }
 
-        val alpha = ObjectAnimator.ofFloat(
+        val appearing = ObjectAnimator.ofFloat(
             this, View.ALPHA,
-            1f,
             0f,
+            1f,
         ).apply {
-            interpolator = DecelerateInterpolator()
-            duration = totalDuration.toLong()
+            duration = appearDuration.toLong()
         }
 
         lift.start()
         swing.start()
         rotation.start()
-        alpha.start()
+        appearing.start()
+
+        lift.doOnEnd {
+            swing.cancel()
+            rotation.cancel()
+            isVisible = false
+            translationX = 0f
+            translationY = 0f
+            setRotation(0f)
+        }
+        appearing.doOnStart {
+            isVisible = true
+        }
     }
 }

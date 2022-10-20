@@ -14,11 +14,11 @@ import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
 import androidx.core.graphics.withClip
 import androidx.core.graphics.withRotation
+import androidx.core.graphics.withTranslation
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.tools.withMathCoordinates
 import kotlin.math.abs
 import kotlin.math.min
-
 
 class ProgressMeterView @JvmOverloads constructor(
     context: Context,
@@ -73,10 +73,11 @@ class ProgressMeterView @JvmOverloads constructor(
         }
         context.getColor(colorInt)
     }
-    private val tempRect = Rect()
+    private val drawRect = RectF()
     private val rect = RectF()
     private val path = Path()
 
+    private val widthHeightRatio = 3f / 2f
     private val scaleOffset = 200f
     private val degreeOffset = 25f
     private val bigTickCount = 5
@@ -120,22 +121,44 @@ class ProgressMeterView @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val widthSpecMode = MeasureSpec.getMode(widthMeasureSpec)
         val heightSpecMode = MeasureSpec.getMode(heightMeasureSpec)
+        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
+        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+        val desiredHeight = if (heightSpecMode == MeasureSpec.AT_MOST) {
+            min(measuredHeight, heightSize)
+        } else {
+            measuredHeight
+        }
+        val desiredWidth = if (widthSpecMode == MeasureSpec.AT_MOST) {
+            min(measuredWidth, widthSize)
+        } else {
+            measuredWidth
+        }
         val resizeWidth = widthSpecMode != MeasureSpec.EXACTLY
         val resizeHeight = heightSpecMode != MeasureSpec.EXACTLY
-        if (resizeWidth && measuredWidth > measuredHeight) {
-            setMeasuredDimension(measuredHeight, measuredHeight)
+        if (resizeWidth && desiredWidth > desiredHeight * widthHeightRatio) {
+            setMeasuredDimension((desiredHeight * widthHeightRatio).toInt(), desiredHeight)
             return
         }
-        if (resizeHeight && measuredHeight > measuredWidth) {
-            setMeasuredDimension(measuredWidth, measuredWidth)
+        if (resizeHeight && desiredHeight * widthHeightRatio > desiredWidth) {
+            setMeasuredDimension(desiredWidth, (desiredWidth / widthHeightRatio).toInt())
+            return
+        }
+        if (resizeHeight && resizeWidth) {
+            val minWidth = minOf(desiredWidth.toFloat(), desiredHeight * widthHeightRatio)
+            setMeasuredDimension(minWidth.toInt(), (minWidth / widthHeightRatio).toInt())
             return
         }
     }
 
     override fun onDraw(canvas: Canvas) {
-        val size = min(width, height) / 2
+        val halfWidth = width / 2f
+        val desiredHeight = minOf(width / widthHeightRatio, height * widthHeightRatio)
+        val dy = (desiredHeight - width) / 2f
+        val bottom = +halfWidth + dy
+        val top = -halfWidth + dy
+        drawRect.set(-halfWidth, top, +halfWidth, bottom)
         canvas.withMathCoordinates(width, height) {
-            canvas.withClip(-size, +size, +size, -size) {
+            canvas.withClip(-halfWidth, +halfWidth, +halfWidth, -halfWidth) {
                 drawBackground(canvas)
                 drawFilling(canvas)
                 drawScale(canvas)
@@ -147,7 +170,7 @@ class ProgressMeterView @JvmOverloads constructor(
     private fun drawBackground(canvas: Canvas) {
         val shadowSize = 40f
         val dx = shadowSize / 8
-        canvas.getClipBounds(rect)
+        rect.set(drawRect)
         rect.inset(borderPaint.strokeWidth, borderPaint.strokeWidth)
         canvas.drawArc(rect, 0f, 180f, true, shadowPaint)
         // Background
@@ -166,7 +189,7 @@ class ProgressMeterView @JvmOverloads constructor(
         val bucketSize = 1f / (bigTickCount - 1)
         val uiBucketSize = (180f - 2 * degreeOffset) / (bigTickCount - 1)
         val fullBucketsCount = (progress / bucketSize).toInt()
-        canvas.getClipBounds(rect)
+        rect.set(drawRect)
         rect.inset(scaleOffset - fillPaint.strokeWidth / 2, scaleOffset - fillPaint.strokeWidth / 2)
         // Full buckets
         repeat(fullBucketsCount) { bucketNumber ->
@@ -182,7 +205,7 @@ class ProgressMeterView @JvmOverloads constructor(
     }
 
     private fun drawScale(canvas: Canvas) {
-        canvas.getClipBounds(rect)
+        rect.set(drawRect)
         rect.inset(scaleOffset, scaleOffset)
         canvas.drawArc(rect, 180f - degreeOffset, -180f + 2 * degreeOffset, false, scalePaint)
         val scaleHeight = rect.height() / 2
@@ -191,8 +214,8 @@ class ProgressMeterView @JvmOverloads constructor(
         val bigTickStep = (180f - 2 * degreeOffset) / (bigTickCount - 1)
         // Big ticks
         repeat(bigTickCount) { i ->
-            canvas.withRotation(90 - degreeOffset - i * bigTickStep) {
-                canvas.drawLine(0f, scaleHeight, 0f, scaleHeight + bigTickHeight, scalePaint)
+            canvas.withRotation(90 - degreeOffset - i * bigTickStep, rect.centerX(), rect.centerY()) {
+                canvas.drawLine(0f, rect.centerY() + scaleHeight, 0f, rect.centerY() + scaleHeight + bigTickHeight, scalePaint)
             }
         }
         // Small ticks
@@ -200,30 +223,34 @@ class ProgressMeterView @JvmOverloads constructor(
         val smallTickStep = (180f - 2 * degreeOffset) / (totalSmallTickCount - 1)
         scalePaint.strokeWidth /= smallTickCount
         repeat(totalSmallTickCount) { i ->
-            canvas.withRotation(90 - degreeOffset - i * smallTickStep) {
-                canvas.drawLine(0f, scaleHeight, 0f, scaleHeight + smallTickHeight, scalePaint)
+            canvas.withRotation(90 - degreeOffset - i * smallTickStep, rect.centerX(), rect.centerY()) {
+                canvas.drawLine(0f, rect.centerY() + scaleHeight, 0f, rect.centerY() + scaleHeight + smallTickHeight, scalePaint)
             }
         }
         scalePaint.strokeWidth *= smallTickCount
     }
 
     private fun drawNeedle(canvas: Canvas) {
+        rect.set(drawRect)
+        rect.inset(scaleOffset, scaleOffset)
         val sweepAngle = (180f - 2 * degreeOffset) * progress
         val scaleHeight = rect.height() / 2
-        canvas.withRotation(90f - degreeOffset - sweepAngle) {
-            val needleWidth = 15f
-            path.apply {
-                rewind()
-                moveTo(-needleWidth, 0f)
-                lineTo(-needleWidth, scaleHeight * 0.9f)
-                lineTo(0f, scaleHeight * 1.15f)
-                lineTo(+needleWidth, scaleHeight * 0.9f)
-                lineTo(+needleWidth, 0f)
-                close()
+        canvas.withTranslation(rect.centerX(), rect.centerY()) {
+            canvas.withRotation(90f - degreeOffset - sweepAngle) {
+                val needleWidth = 15f
+                path.apply {
+                    rewind()
+                    moveTo(-needleWidth, 0f)
+                    lineTo(-needleWidth, scaleHeight * 0.9f)
+                    lineTo(0f, scaleHeight * 1.15f)
+                    lineTo(+needleWidth,  scaleHeight * 0.9f)
+                    lineTo(+needleWidth, 0f)
+                    close()
+                }
+                canvas.drawPath(path, needlePaint)
             }
-            canvas.drawPath(path, needlePaint)
+            canvas.drawCircle(0f, 0f, 40f, needlePaint)
         }
-        canvas.drawCircle(0f, 0f, 40f, needlePaint)
     }
 
     @ColorInt
@@ -272,10 +299,4 @@ class ProgressMeterView @JvmOverloads constructor(
             }
         }
     }
-
-    private fun Canvas.getClipBounds(rect: RectF) {
-        this.getClipBounds(tempRect)
-        rect.set(tempRect)
-    }
-
 }
