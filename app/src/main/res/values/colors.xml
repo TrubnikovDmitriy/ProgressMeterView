@@ -7,4 +7,15 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="meter_background">#C0C0C0</color>
+    <color name="meter_shadow">#A1A1A1</color>
+    <color name="meter_border">#E0E0E0</color>
+    <color name="meter_needle">#2E2E2E</color>
+
+    <color name="meter_level_0">#193BD2</color>
+    <color name="meter_level_1">#11AB18</color>
+    <color name="meter_level_2">#FFFA5F</color>
+    <color name="meter_level_3">#FFA000</color>
+    <color name="meter_level_4">#D83C2D</color>
 </resources>

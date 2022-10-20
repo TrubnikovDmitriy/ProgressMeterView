@@ -16,6 +16,7 @@ import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
 import javax.inject.Inject
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -30,9 +31,26 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainViewModel>()
     private val viewBinding by unsafeLazy { ActivityMainBinding.inflate(layoutInflater) }
 
+    private var sign = +1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+        viewBinding.root.post {
+            viewBinding.floatingText.setOnClickListener {
+                viewBinding.floatingText.animateFloating(
+                    viewBinding.root.width.toFloat(),
+                    viewBinding.root.height.toFloat(),
+                )
+            }
+            val random = Random(viewBinding.coolometer.hashCode())
+            viewBinding.coolometer.setOnClickListener {
+                val progress = viewBinding.coolometer.progress
+                if (progress <= 0f || progress >= 1f) {
+                    sign *= -1
+                }
+                viewBinding.coolometer.setProgress(progress + sign * random.nextFloat(), true)
+            }
+        }
     }
 
     override fun onStart() {
