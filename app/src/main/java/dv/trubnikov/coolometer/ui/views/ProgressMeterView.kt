@@ -14,8 +14,10 @@ import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
 import androidx.core.graphics.withClip
 import androidx.core.graphics.withRotation
+import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import dv.trubnikov.coolometer.R
+import dv.trubnikov.coolometer.tools.setTextSizeForHeight
 import dv.trubnikov.coolometer.tools.withMathCoordinates
 import kotlin.math.abs
 import kotlin.math.min
@@ -73,10 +75,20 @@ class ProgressMeterView @JvmOverloads constructor(
         }
         context.getColor(colorInt)
     }
+    private val digitPaint = Paint().apply {
+        color = context.getColor(R.color.meter_score)
+        typeface = context.resources.getFont(R.font.digital_font)
+        textSize = context.resources.getDimension(R.dimen.meter_digital_number_size)
+        isFakeBoldText = true
+    }
     private val drawRect = RectF()
+    private val textRect = Rect()
     private val rect = RectF()
     private val path = Path()
 
+    private val dp = context.resources.getDimension(R.dimen.one_dp)
+    private val textPadding = 16 * dp
+    private var nippleRadius = 12 * dp
     private val widthHeightRatio = 3f / 2f
     private val scaleOffset = 200f
     private val degreeOffset = 25f
@@ -85,7 +97,10 @@ class ProgressMeterView @JvmOverloads constructor(
     private val progressPerSecond = 0.35f
 
     @FloatRange(from = 0.0, to = 1.0)
-    var progress = 0.7f
+    var progress: Float = 0.7f
+        private set
+
+    var score: Int = 4200
         private set
 
     init {
@@ -150,15 +165,23 @@ class ProgressMeterView @JvmOverloads constructor(
         }
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        // It defines sizes that depend on the size of this view
+        val desiredHeight = minOf(width / widthHeightRatio, height * widthHeightRatio)
+        val heightForScoreboard = desiredHeight - width / 2 - borderPaint.strokeWidth * 2 - textPadding
+        digitPaint.setTextSizeForHeight(heightForScoreboard, "0")
+        nippleRadius = width / 30f
+    }
+
     override fun onDraw(canvas: Canvas) {
         val halfWidth = width / 2f
         val desiredHeight = minOf(width / widthHeightRatio, height * widthHeightRatio)
         val dy = (desiredHeight - width) / 2f
-        val bottom = +halfWidth + dy
-        val top = -halfWidth + dy
-        drawRect.set(-halfWidth, top, +halfWidth, bottom)
+        drawRect.set(-halfWidth, -halfWidth, +halfWidth, +halfWidth)
+        drawRect.offset(0f, dy)
         canvas.withMathCoordinates(width, height) {
             canvas.withClip(-halfWidth, +halfWidth, +halfWidth, -halfWidth) {
+                drawScoreboard(canvas)
                 drawBackground(canvas)
                 drawFilling(canvas)
                 drawScale(canvas)
@@ -249,7 +272,28 @@ class ProgressMeterView @JvmOverloads constructor(
                 }
                 canvas.drawPath(path, needlePaint)
             }
-            canvas.drawCircle(0f, 0f, 40f, needlePaint)
+            canvas.drawCircle(0f, 0f, nippleRadius, needlePaint)
+        }
+    }
+
+    private fun drawScoreboard(canvas: Canvas) {
+        val text = score.toString()
+        digitPaint.getTextBounds(text, 0, text.length, textRect)
+        val oneDigitWidthAdjustment = digitPaint.measureText("0", 0, 1) / 6
+        val textWidth = textRect.width()
+        val textHeight = textRect.height()
+        val scoreboardWidth = textWidth + borderPaint.strokeWidth + textPadding
+        val scoreboardHeight = 2 * (textHeight + nippleRadius + borderPaint.strokeWidth + textPadding)
+        rect.left = drawRect.centerX() - scoreboardWidth / 2
+        rect.right = drawRect.centerX() + scoreboardWidth / 2
+        rect.top = drawRect.centerY() + scoreboardHeight / 2
+        rect.bottom = drawRect.centerY() - scoreboardHeight / 2
+        canvas.drawRoundRect(rect, textPadding, textPadding, backgroundPaint)
+        canvas.drawRoundRect(rect, textPadding, textPadding, borderPaint)
+        val textX = rect.centerX() - textWidth / 2 - oneDigitWidthAdjustment
+        val textY = rect.centerY() - textHeight - borderPaint.strokeWidth / 2 - textPadding / 2
+        canvas.withScale(1f, -1f) {
+            canvas.drawText(text, textX, -textY, digitPaint)
         }
     }
 

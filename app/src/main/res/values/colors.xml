@@ -15,6 +15,7 @@
     <color name="meter_shadow">#A1A1A1</color>
     <color name="meter_border">#E0E0E0</color>
     <color name="meter_needle">#2E2E2E</color>
+    <color name="meter_score">#595959</color>
 
     <color name="meter_level_0">#193BD2</color>
     <color name="meter_level_1">#11AB18</color>
