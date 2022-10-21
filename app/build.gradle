@@ -1,8 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.gms.google-services'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.gms.google-services'
     id 'kotlin-kapt'
 }
 
@@ -45,7 +46,7 @@ dependencies {
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:31.0.0')
     implementation 'com.google.firebase:firebase-messaging-ktx'
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     // Coroutines, Lifecycles, ViewModels and etc
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'

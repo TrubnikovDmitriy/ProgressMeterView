@@ -7,7 +7,6 @@ import dv.trubnikov.coolometer.domain.cloud.CloudMessageQueue
 import dv.trubnikov.coolometer.domain.cloud.CloudTokenProvider
 import dv.trubnikov.coolometer.domain.models.CloudMessageParser
 import dv.trubnikov.coolometer.tools.assertFail
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint

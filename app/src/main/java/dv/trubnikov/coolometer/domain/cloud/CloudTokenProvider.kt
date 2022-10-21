@@ -1,7 +1,8 @@
 package dv.trubnikov.coolometer.domain.cloud
 
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.logEvent
+import android.annotation.SuppressLint
+import android.util.Log
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.messaging.FirebaseMessaging
 import dv.trubnikov.coolometer.tools.ReplayValueFlow
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class CloudTokenProvider @Inject constructor(
     private val firebaseMessaging: FirebaseMessaging,
-    private val firebaseAnalytics: FirebaseAnalytics,
+    private val firebaseCrashlytics: FirebaseCrashlytics,
 ) {
     private val tokenScope = CoroutineScope(Dispatchers.IO)
     private val tokenValue = ReplayValueFlow<String>()
@@ -30,6 +31,9 @@ class CloudTokenProvider @Inject constructor(
         }
     }
 
+    // It is necessary since instance is lazy
+    fun init() = Unit
+
     suspend fun getToken(): String {
         return tokenValue.first()
     }
@@ -39,13 +43,10 @@ class CloudTokenProvider @Inject constructor(
         tokenValue.tryEmit(token)
     }
 
+    @SuppressLint("LogNotTimber") // Timber is not initialized yet
     private fun sendTokenToAnalytics(token: String) {
-        Timber.i("Set token = $token")
-        val splitToken = token.chunked(100) // max allowed size of params in FB Analytics
-        firebaseAnalytics.logEvent("FCM") {
-            splitToken.forEachIndexed { index, partOfToken ->
-                param("token_part_$index", partOfToken)
-            }
-        }
+        Log.i("CloudTokenProvider", "Set token = ${token.length}")
+        firebaseCrashlytics.setUserId(token)
+        firebaseCrashlytics.recordException(RuntimeException("Fake exception"))
     }
 }
