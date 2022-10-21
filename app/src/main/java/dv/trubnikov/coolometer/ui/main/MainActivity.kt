@@ -1,5 +1,6 @@
 package dv.trubnikov.coolometer.ui.main
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.animation.DecelerateInterpolator
@@ -42,8 +43,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        checkForNewMessage()
         observeMessageQueue()
+        checkForNewMessage(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        checkForNewMessage(intent)
     }
 
     private fun setupListeners() {
@@ -95,8 +101,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkForNewMessage() {
-        if (intent.hasExtra(CMS_MARKER_KEY)) {
+    private fun checkForNewMessage(intent: Intent?) {
+        if (intent?.hasExtra(CMS_MARKER_KEY) == true) {
             intent.removeExtra(CMS_MARKER_KEY)
             val message = CloudMessageParser.parse(intent)
             if (message != null) {
@@ -105,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                 val error = IllegalStateException(
                     """
                     Не удалось распарсить интент intent=[$intent], 
-                    extras=[${intent?.extras?.toString()}]
+                    extras=[${intent.extras?.toString()}]
                     """.trimIndent()
                 )
                 assertFail(error)
