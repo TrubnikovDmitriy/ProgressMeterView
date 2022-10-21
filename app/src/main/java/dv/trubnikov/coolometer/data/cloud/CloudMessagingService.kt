@@ -1,4 +1,4 @@
-package dv.trubnikov.coolometer.ui.cloud
+package dv.trubnikov.coolometer.data.cloud
 
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage

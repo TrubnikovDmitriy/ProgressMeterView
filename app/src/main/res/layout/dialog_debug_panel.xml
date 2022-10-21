@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:paddingTop="@dimen/debug_panel_corner_radius"
+    android:background="@drawable/bg_debug_panel"
+    >
+
+    <include layout="@layout/vh_debug_button" />
+    <include layout="@layout/vh_debug_button" />
+    <include layout="@layout/vh_debug_switcher" />
+    <include layout="@layout/vh_debug_spinner" />
+    <include layout="@layout/vh_debug_switcher" />
+    <include layout="@layout/vh_debug_switcher" />
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

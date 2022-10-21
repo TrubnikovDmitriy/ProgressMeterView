@@ -9,7 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.github.jinatonic.confetti.CommonConfetti
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import dv.trubnikov.coolometer.BuildConfig
 import dv.trubnikov.coolometer.databinding.ActivityMainBinding
 import dv.trubnikov.coolometer.domain.cloud.CloudMessageQueue
 import dv.trubnikov.coolometer.domain.models.CloudMessage
@@ -18,6 +21,7 @@ import dv.trubnikov.coolometer.domain.models.FakeMessage
 import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
+import dv.trubnikov.coolometer.ui.debug.ModalBottomSheet
 import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
 import javax.inject.Inject
 
@@ -57,8 +61,9 @@ class MainActivity : AppCompatActivity() {
             if (forward) showConfetti()
         }
         viewBinding.root.setOnClickListener {
-            handleMessage(FakeMessage())
-        }
+//            handleMessage(FakeMessage())
+            showDebugPanel()
+         }
     }
 
     private fun handleMessage(message: CloudMessage) {
@@ -117,6 +122,12 @@ class MainActivity : AppCompatActivity() {
                 assertFail(error)
             }
         }
+    }
+
+    private fun showDebugPanel() {
+        if (!BuildConfig.DEBUG) return
+        val modalBottomSheet = ModalBottomSheet()
+        modalBottomSheet.show(supportFragmentManager, null)
     }
 
     private fun checkForNotificationPermissions() {
