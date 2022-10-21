@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:fontFamily="@font/digital_font"
+        android:fontFamily="@font/digital_cyrillic"
         android:gravity="center"
         android:lineSpacingExtra="10sp"
         android:textSize="30sp"
@@ -34,11 +34,11 @@
         />
 
     <dv.trubnikov.coolometer.ui.views.FloatingTextView
-        android:id="@+id/floating_text"
+        android:id="@+id/floatingText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:fontFamily="@font/bubble_font"
+        android:fontFamily="@font/bubble_cyrillic"
         android:gravity="center"
         android:padding="12dp"
         android:shadowColor="@android:color/black"

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Крутометр</string>
+    <string name="add_widget">Добавить виджет</string>
+    <string name="app_widget_description">Веди учёт своей крутости</string>
 </resources>
