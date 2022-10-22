@@ -1,0 +1,7 @@
+ext {
+    confetti = '1.1.2'
+    dagger = '2.44'
+    firebase = '31.0.0'
+    lifecycle = '2.5.1'
+    room = '2.4.3'
+}
