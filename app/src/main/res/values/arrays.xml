@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="debug_panel_small_ticks_spinner">
+        <item>1 тик</item>
+        <item>2 тика</item>
+        <item>3 тика</item>
+        <item>4 тика</item>
+        <item>5 тиков</item>
+        <item>6 тиков</item>
+    </string-array>
+    <string-array name="debug_panel_big_ticks_spinner">
+        <item>2 тика</item>
+        <item>3 тика</item>
+        <item>4 тика</item>
+        <item>5 тиков</item>
+        <item>6 тиков</item>
+    </string-array>
+</resources>

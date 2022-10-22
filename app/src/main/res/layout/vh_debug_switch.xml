@@ -8,28 +8,24 @@
     android:background="?attr/selectableItemBackground"
     android:gravity="center"
     android:orientation="horizontal"
-    android:padding="12dp"
-    tools:background="@drawable/bg_debug_panel"
+    android:padding="18dp"
     >
 
     <TextView
+        style="@style/DebugItemText"
         android:id="@+id/debug_button_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
-        android:ellipsize="end"
-        android:gravity="start"
-        android:maxLines="2"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/debug_spinner"
+        app:layout_constraintEnd_toStartOf="@+id/debug_switch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/lorem/random"
         />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/debug_spinner"
+        android:id="@+id/debug_switch"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

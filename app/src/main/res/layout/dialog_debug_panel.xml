@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center_horizontal"
+    android:orientation="vertical"
     android:paddingTop="@dimen/debug_panel_corner_radius"
-    android:background="@drawable/bg_debug_panel"
     >
 
-    <include layout="@layout/vh_debug_button" />
-    <include layout="@layout/vh_debug_button" />
-    <include layout="@layout/vh_debug_switcher" />
-    <include layout="@layout/vh_debug_spinner" />
-    <include layout="@layout/vh_debug_switcher" />
-    <include layout="@layout/vh_debug_switcher" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="12dp"
+        android:fontFamily="@font/digital_cyrillic"
+        android:text="@string/debug_panel_title"
+        android:textSize="28sp"
+        />
 
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/debug_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="true"
+        tools:itemCount="5"
+        tools:listitem="@layout/vh_debug_switch"
+        />
 
 </androidx.appcompat.widget.LinearLayoutCompat>
