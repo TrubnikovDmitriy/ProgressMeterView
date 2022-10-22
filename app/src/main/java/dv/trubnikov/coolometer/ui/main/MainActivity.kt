@@ -9,15 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.github.jinatonic.confetti.CommonConfetti
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dv.trubnikov.coolometer.BuildConfig
 import dv.trubnikov.coolometer.databinding.ActivityMainBinding
 import dv.trubnikov.coolometer.domain.cloud.CloudMessageQueue
-import dv.trubnikov.coolometer.domain.models.CloudMessage
 import dv.trubnikov.coolometer.domain.models.CloudMessageParser
-import dv.trubnikov.coolometer.domain.models.FakeMessage
+import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
@@ -62,11 +59,16 @@ class MainActivity : AppCompatActivity() {
         }
         viewBinding.root.setOnClickListener {
 //            handleMessage(FakeMessage())
-            showDebugPanel()
+//            showDebugPanel()
+            viewModel.onClick()
+         }
+        viewBinding.root.setOnLongClickListener {
+            viewModel.onLongClick()
+            false
          }
     }
 
-    private fun handleMessage(message: CloudMessage) {
+    private fun handleMessage(message: Message) {
         with(viewBinding) {
             floatingText.text = message.shortMessage
             floatingText.animateFloating(root.width.toFloat(), progressMeter.bottom.toFloat())

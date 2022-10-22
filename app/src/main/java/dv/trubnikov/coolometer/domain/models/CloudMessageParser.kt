@@ -5,35 +5,41 @@ import android.os.Bundle
 import com.google.firebase.messaging.RemoteMessage
 import timber.log.Timber
 
+// TODO: It is shouldn't be in domain
 object CloudMessageParser {
 
-    private const val EXPLAIN_KEY = "coolometer_explain_key"
     private const val BUBBLE_KEY = "coolometer_bubble_key"
     private const val SCORE_KEY = "coolometer_score_key"
+    private const val TEXT_KEY = "coolometer_text_key"
+    private const val ID_KEY = "coolometer_id_key"
 
-    fun parse(message: RemoteMessage): CloudMessage? {
-        val title = message.getOrLogError(EXPLAIN_KEY) ?: return null
+    fun parse(message: RemoteMessage): Message? {
+        val id = message.getOrLogError(ID_KEY) ?: return null
+        val title = message.getOrLogError(TEXT_KEY) ?: return null
         val text = message.getOrLogError(BUBBLE_KEY) ?: return null
         val scoreString = message.getOrLogError(SCORE_KEY) ?: return null
         val score = parseScoreOrLogError(scoreString) ?: return null
         return FirebaseMessage(
+            messageId = id,
             longMessage = title,
             shortMessage = text,
             score = score
         )
     }
 
-    fun parse(intent: Intent): CloudMessage? {
+    fun parse(intent: Intent): Message? {
         val extras = intent.extras
         if (extras == null) {
             Timber.e("Отсутствуют extras у интента [$intent].")
             return null
         }
-        val title = extras.getOrLogError(EXPLAIN_KEY) ?: return null
+        val id = extras.getOrLogError(ID_KEY) ?: return null
+        val title = extras.getOrLogError(TEXT_KEY) ?: return null
         val text = extras.getOrLogError(BUBBLE_KEY) ?: return null
         val scoreString = extras.getOrLogError(SCORE_KEY) ?: return null
         val score = parseScoreOrLogError(scoreString) ?: return null
         return FirebaseMessage(
+            messageId = id,
             longMessage = title,
             shortMessage = text,
             score = score
