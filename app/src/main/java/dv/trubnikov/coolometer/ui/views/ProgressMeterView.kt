@@ -13,6 +13,7 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.BounceInterpolator
 import android.view.animation.LinearInterpolator
+import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.tools.getVibratorManager
 import kotlin.math.abs
 import kotlin.math.min
@@ -78,6 +79,24 @@ class ProgressMeterView @JvmOverloads constructor(
         }
 
     init {
+        context.theme.obtainStyledAttributes(
+            attrs, R.styleable.ProgressMeterView, defStyleAttr, defStyleRes
+        ).use {
+            val rawBigTickCount = it.getInteger(R.styleable.ProgressMeterView_bigTicksCount, 5)
+            val rawSmallTickCount = it.getInteger(R.styleable.ProgressMeterView_smallTicksCount, 2)
+            val rawMaxProgress = it.getInteger(R.styleable.ProgressMeterView_maxProgress, 1_000)
+            val rawGravity = it.getInteger(R.styleable.ProgressMeterView_gravity, 0)
+
+            drawer.bigTickCount = rawBigTickCount.coerceIn(3, 6)
+            drawer.smallTickCount = rawSmallTickCount.coerceIn(0, 10)
+            drawer.maxProgress = rawMaxProgress.coerceAtLeast(10)
+            drawer.gravity = when(rawGravity) {
+                0 -> ProgressMeterDrawer.Gravity.CENTER
+                1 -> ProgressMeterDrawer.Gravity.TOP
+                2 -> ProgressMeterDrawer.Gravity.BOTTOM
+                else -> ProgressMeterDrawer.Gravity.CENTER
+            }
+        }
         setupVibrationForAfterAnimation()
         totalProgressAnimator.interpolator = LinearInterpolator()
     }

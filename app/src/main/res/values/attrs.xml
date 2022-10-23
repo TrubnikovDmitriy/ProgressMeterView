@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ProgressMeterView">
+        <attr name="bigTicksCount" format="integer" />
+        <attr name="smallTicksCount" format="integer" />
+        <attr name="maxProgress" format="integer" />
+        <attr name="gravity" format="enum">
+            <enum name="center" value="0"/>
+            <enum name="top" value="1"/>
+            <enum name="bottom" value="2"/>
+        </attr>
+    </declare-styleable>
+</resources>

@@ -4,12 +4,11 @@ import android.content.Context
 import android.graphics.*
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
-import androidx.core.graphics.withClip
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withScale
 import androidx.core.graphics.withTranslation
 import dv.trubnikov.coolometer.R
-import dv.trubnikov.coolometer.tools.setTextSizeForHeight
+import dv.trubnikov.coolometer.tools.setTextSizeForSize
 import dv.trubnikov.coolometer.tools.withMathCoordinates
 
 class ProgressMeterDrawer(
@@ -20,8 +19,11 @@ class ProgressMeterDrawer(
     var smallTickCount: Int = 2,
     var bigTickCount: Int = 5,
     var degreeOffset: Float = 25f,
+    var gravity: Gravity = Gravity.CENTER,
     val widthHeightRatio: Float = 3f / 2f,
 ) {
+
+    enum class Gravity { CENTER, TOP, BOTTOM }
 
     private val borderPaint = Paint().apply {
         color = context.getColor(R.color.meter_border)
@@ -92,9 +94,8 @@ class ProgressMeterDrawer(
     fun setSize(width: Int, height: Int) {
         // It defines sizes that depend on the size of this view
         val desiredHeight = minOf(width / widthHeightRatio, height * widthHeightRatio)
-        val heightForScoreboard =
-            desiredHeight - width / 2 - borderPaint.strokeWidth * 2 - textPadding
-        digitPaint.setTextSizeForHeight(heightForScoreboard, "0")
+        val heightForScoreboard = desiredHeight - width / 2 - borderPaint.strokeWidth * 2 - textPadding
+        digitPaint.setTextSizeForSize(width / 25f, heightForScoreboard, "0")
         nippleRadius = width / 30f
     }
 
@@ -104,14 +105,19 @@ class ProgressMeterDrawer(
         val dy = (desiredHeight - width) / 2f
         drawRect.set(-halfWidth, -halfWidth, +halfWidth, +halfWidth)
         drawRect.offset(0f, dy)
-        canvas.withMathCoordinates(width, height) {
-            canvas.withClip(-halfWidth, +halfWidth, +halfWidth, -halfWidth) {
-                drawScoreboard(canvas)
-                drawBackground(canvas)
-                drawFilling(canvas)
-                drawScale(canvas)
-                drawNeedle(canvas)
-            }
+
+        val translateByY = when (gravity) {
+            Gravity.CENTER -> 0
+            Gravity.TOP -> -(height - halfWidth + dy).toInt()
+            Gravity.BOTTOM -> +(height - halfWidth + dy).toInt()
+        }
+
+        canvas.withMathCoordinates(width, height + translateByY) {
+            drawScoreboard(canvas)
+            drawBackground(canvas)
+            drawFilling(canvas)
+            drawScale(canvas)
+            drawNeedle(canvas)
         }
     }
 
