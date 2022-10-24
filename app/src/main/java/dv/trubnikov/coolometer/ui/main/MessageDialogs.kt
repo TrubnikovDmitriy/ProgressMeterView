@@ -14,7 +14,7 @@ fun Activity.showNewMessageDialog(message: Message, onAccept: (Message) -> Unit)
     val title = buildTitle(R.string.alert_dialog_new_message, message.score)
     MaterialAlertDialogBuilder(this)
         .setTitle(title)
-        .setMessage(message.longMessage)
+        .setMessage(message.text)
         .setPositiveButton(R.string.generic_accept) { _, _ -> onAccept(message) }
         .setNegativeButton(R.string.generic_close, null)
         .show()
@@ -24,7 +24,7 @@ fun Activity.showAcceptMessage(message: Message, onAccept: (Message) -> Unit) {
     val title = buildTitle(R.string.alert_dialog_accept_message, message.score)
     MaterialAlertDialogBuilder(this)
         .setTitle(title)
-        .setMessage(message.longMessage)
+        .setMessage(message.text)
         .setPositiveButton(R.string.generic_accept) { _, _ -> onAccept(message) }
         .setNegativeButton(R.string.generic_close, null)
         .show()
@@ -42,7 +42,7 @@ fun Activity.showChoiceDialog(messages: List<Message>, onClickItem: (Message) ->
     if (messages.isEmpty()) return
     val maxMessageLength = 50
     val items = messages.map {
-        val cutMessage = it.longMessage.take(maxMessageLength)
+        val cutMessage = it.text.take(maxMessageLength)
         if (cutMessage.length == maxMessageLength) {
             "$cutMessage…"
         } else {

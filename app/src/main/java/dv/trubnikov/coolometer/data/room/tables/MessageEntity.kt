@@ -12,9 +12,6 @@ data class MessageEntity(
     @ColumnInfo(name = "score")
     val score: Int,
 
-    @ColumnInfo(name = "bubble")
-    val bubble: String,
-
     @ColumnInfo(name = "text")
     val text: String,
 

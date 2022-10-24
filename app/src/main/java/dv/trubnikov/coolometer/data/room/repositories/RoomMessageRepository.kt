@@ -4,10 +4,14 @@ import android.database.sqlite.SQLiteException
 import androidx.annotation.WorkerThread
 import dv.trubnikov.coolometer.data.room.dao.MessageDao
 import dv.trubnikov.coolometer.data.room.tables.MessageEntity
-import dv.trubnikov.coolometer.domain.models.FirebaseMessage
 import dv.trubnikov.coolometer.domain.models.Message
+import dv.trubnikov.coolometer.domain.parsers.MessageParser
+import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
+import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.serialize
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.tools.Out
+import dv.trubnikov.coolometer.tools.getOr
+import dv.trubnikov.coolometer.tools.getOrThrow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -19,12 +23,13 @@ import javax.inject.Singleton
 @Singleton
 class RoomMessageRepository @Inject constructor(
     private val messageDao: MessageDao,
+    private val parser: MessageParser,
 ) : MessageRepository {
 
     @WorkerThread
     override fun insertMessageBlocking(message: Message): Out<Unit> {
         return try {
-            val entity = message.toEntity()
+            val entity = parser.serialize<MessageEntity>(message).getOr { return it }
             messageDao.insertMessageBlocking(entity)
             Out.Success(Unit)
         } catch (e: SQLiteException) {
@@ -33,8 +38,8 @@ class RoomMessageRepository @Inject constructor(
     }
 
     override suspend fun insertMessage(message: Message): Out<Unit> {
+        val entity = parser.serialize<MessageEntity>(message).getOr { return it }
         return safeDatabaseRequest(Dispatchers.IO) {
-            val entity = message.toEntity()
             messageDao.insertMessage(entity)
         }
     }
@@ -42,7 +47,7 @@ class RoomMessageRepository @Inject constructor(
     override suspend fun getUnreceivedMessages(): Flow<List<Message>> {
         return flow {
             messageDao.getUnreceivedMessages().collect { messages ->
-                val models = messages.map { it.toModel() }
+                val models = messages.map { parser.parse(it).getOrThrow() }
                 emit(models)
             }
         }
@@ -72,25 +77,5 @@ class RoomMessageRepository @Inject constructor(
         } catch (e: SQLiteException) {
             Out.Failure(e)
         }
-    }
-
-    private fun Message.toEntity(): MessageEntity {
-        return MessageEntity(
-            id = messageId,
-            score = score,
-            bubble = shortMessage,
-            text = longMessage,
-            isReceived = false,
-            timestamp = System.currentTimeMillis()
-        )
-    }
-
-    private fun MessageEntity.toModel(): Message {
-        return FirebaseMessage(
-            messageId = id,
-            score = score,
-            shortMessage = bubble,
-            longMessage = text,
-        )
     }
 }

@@ -3,11 +3,11 @@ package dv.trubnikov.coolometer.domain.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.Data
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dv.trubnikov.coolometer.domain.parsers.MessageParser
+import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.tools.getOrThrow
 import timber.log.Timber
@@ -17,7 +17,7 @@ class HandleMessageWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val messageRepository: MessageRepository,
-    private val parser: MessageParser<Data>,
+    private val parser: MessageParser,
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {

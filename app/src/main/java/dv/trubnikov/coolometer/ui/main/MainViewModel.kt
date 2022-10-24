@@ -7,12 +7,15 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dv.trubnikov.coolometer.domain.models.CloudMessageParser
 import dv.trubnikov.coolometer.domain.models.Message
+import dv.trubnikov.coolometer.domain.parsers.MessageParser
+import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.domain.workers.UpdateWidgetWorker
 import dv.trubnikov.coolometer.tools.OneshotValueFlow
+import dv.trubnikov.coolometer.tools.getOr
 import dv.trubnikov.coolometer.tools.getOrThrow
+import dv.trubnikov.coolometer.tools.logError
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import dv.trubnikov.coolometer.ui.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -29,6 +32,7 @@ class MainViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
     private val widgetUpdater: WidgetUpdater,
     private val workManager: WorkManager,
+    private val parser: MessageParser,
 ) : ViewModel() {
 
     val stateFlow = MutableStateFlow<State>(State.Loading)
@@ -79,15 +83,12 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (intent?.hasExtra(CMS_MARKER_KEY) == true) {
                 intent.removeExtra(CMS_MARKER_KEY)
-                val message = CloudMessageParser.parse(intent)
-                if (message != null) {
-                    onMessageFromNotification(message)
-                } else {
-                    Timber.e(
-                        "Не удалось распарсить интент intent=[$intent]," +
-                                " extras=[${intent.extras?.toString()}]"
-                    )
+                val message = parser.parse(intent).getOr { failure ->
+                    Timber.e("Не удалось распарсить входной интент")
+                    failure.logError()
+                    return@launch
                 }
+                onMessageFromNotification(message)
             }
         }
     }

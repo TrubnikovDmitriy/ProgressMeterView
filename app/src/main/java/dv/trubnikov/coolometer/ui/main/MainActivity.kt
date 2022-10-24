@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         with(viewBinding) {
             val isReceived = progressMeter.addProgress(message.score, true)
             if (isReceived) {
-                explainText.text = message.longMessage
+                explainText.text = message.text
                 explainText.isVisible = true
                 viewModel.markAsReceived(message)
             }
