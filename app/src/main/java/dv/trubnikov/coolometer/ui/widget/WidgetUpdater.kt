@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.widget.RemoteViews
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dv.trubnikov.coolometer.R
-import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.tools.getAppWidgetManager
 import dv.trubnikov.coolometer.ui.main.MainActivity
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer
@@ -21,8 +20,7 @@ import javax.inject.Singleton
 
 @Singleton
 class WidgetUpdater @Inject constructor(
-    @ApplicationContext private val appContext: Context,
-    private val messageRepository: MessageRepository,
+    @ApplicationContext private val appContext: Context
 ) {
 
     private val bitmap by lazy {
