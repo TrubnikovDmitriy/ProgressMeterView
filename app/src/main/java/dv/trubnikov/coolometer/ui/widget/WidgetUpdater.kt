@@ -15,6 +15,7 @@ import dv.trubnikov.coolometer.tools.getAppWidgetManager
 import dv.trubnikov.coolometer.ui.main.MainActivity
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,6 +34,7 @@ class WidgetUpdater @Inject constructor(
         val widgetManager = appContext.getAppWidgetManager()
         val widgetIds = widgetManager.getAppWidgetIds(ComponentName(appContext, ProgressMeterWidget::class.java))
         for (widgetId in widgetIds) {
+            Timber.i("Updater widget [$widgetId] with progress [$totalProgress]")
             widgetManager.updateAppWidget(widgetId, remoteView)
         }
     }

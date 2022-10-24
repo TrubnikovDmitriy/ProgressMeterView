@@ -3,10 +3,14 @@ package dv.trubnikov.coolometer.ui.main
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dv.trubnikov.coolometer.domain.models.CloudMessageParser
 import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
+import dv.trubnikov.coolometer.domain.workers.UpdateWidgetWorker
 import dv.trubnikov.coolometer.tools.OneshotValueFlow
 import dv.trubnikov.coolometer.tools.getOrThrow
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
@@ -17,12 +21,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Duration
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
     private val widgetUpdater: WidgetUpdater,
+    private val workManager: WorkManager,
 ) : ViewModel() {
 
     val stateFlow = MutableStateFlow<State>(State.Loading)
@@ -38,6 +44,7 @@ class MainViewModel @Inject constructor(
                 stateFlow.value = createSuccessState(messages)
             }
         }
+        scheduleWidgetUpdater()
     }
 
     fun markAsReceived(message: Message) {
@@ -78,7 +85,7 @@ class MainViewModel @Inject constructor(
                 } else {
                     Timber.e(
                         "Не удалось распарсить интент intent=[$intent]," +
-                        " extras=[${intent.extras?.toString()}]"
+                                " extras=[${intent.extras?.toString()}]"
                     )
                 }
             }
@@ -110,6 +117,19 @@ class MainViewModel @Inject constructor(
         )
     }
 
+    private fun scheduleWidgetUpdater() {
+        viewModelScope.launch {
+            val widgetUpdater = PeriodicWorkRequestBuilder<UpdateWidgetWorker>(
+                repeatInterval = Duration.ofHours(6)
+            ).build()
+            workManager.enqueueUniquePeriodicWork(
+                WIDGET_UPDATER_WORK,
+                ExistingPeriodicWorkPolicy.KEEP,
+                widgetUpdater
+            )
+        }
+    }
+
     sealed interface Action {
         class NotificationDialog(val message: Message) : Action
         class AcceptDialog(val message: Message) : Action
@@ -133,5 +153,6 @@ class MainViewModel @Inject constructor(
 
     companion object {
         private const val CMS_MARKER_KEY = "google.ttl"
+        private const val WIDGET_UPDATER_WORK = "UpdateWidgetWorker_Periodic"
     }
 }
