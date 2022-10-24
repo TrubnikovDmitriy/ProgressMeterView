@@ -4,4 +4,6 @@ ext {
     firebase = '31.0.0'
     lifecycle = '2.5.1'
     room = '2.4.3'
+    work = '2.7.1'
+    work_hilt = '1.0.0'
 }

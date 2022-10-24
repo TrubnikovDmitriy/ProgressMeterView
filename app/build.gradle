@@ -41,13 +41,18 @@ android {
 apply from: '../versions.gradle'
 dependencies {
     // DI
+    kapt "androidx.hilt:hilt-compiler:$work_hilt"
     kapt "com.google.dagger:hilt-compiler:$dagger"
+    implementation "androidx.hilt:hilt-work:$work_hilt"
     implementation "com.google.dagger:hilt-android:$dagger"
 
     // Room
     kapt "androidx.room:room-compiler:$room"
     implementation "androidx.room:room-runtime:$room"
     implementation "androidx.room:room-ktx:$room"
+
+    // WorkManager
+    implementation "androidx.work:work-runtime-ktx:$work"
 
     // Firebase
     implementation platform("com.google.firebase:firebase-bom:$firebase")
