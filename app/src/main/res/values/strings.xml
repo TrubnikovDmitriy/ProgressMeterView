@@ -3,6 +3,23 @@
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">Measure your cooling</string>
 
+    <string name="generic_accept">Accept</string>
+    <string name="generic_close">Close</string>
+    <string name="generic_okay">Okay</string>
+
+    <string name="main_single_achievement">You received the new achievement</string>
+    <string name="main_many_achievements">You received the new achievements</string>
+
+    <string name="alert_dialog_new_message">You have new achievement!</string>
+    <string name="alert_dialog_accept_message">Your achievement is</string>
+    <string name="alert_dialog_already_received_title">Hold on</string>
+    <string name="alert_dialog_already_received_text">You have already received score for this message</string>
+    <string name="alert_dialog_choice_title">You have several messages</string>
+    <plurals name="alert_dialog_received_score">
+        <item quantity="one">%1$s point</item>
+        <item quantity="other">%1$s points</item>
+    </plurals>
+
     <string name="debug_panel_title">Debug panel</string>
     <string name="debug_panel_fake_notification">Send fake notification</string>
     <string name="debug_panel_enable_buttons">Enable debug buttons</string>

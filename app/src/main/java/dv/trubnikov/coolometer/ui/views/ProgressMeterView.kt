@@ -116,6 +116,7 @@ class ProgressMeterView @JvmOverloads constructor(
     private fun addProgress(value: Int, animate: Boolean = false, force: Boolean = false): Boolean {
         if (value == 0) return true
         if (progressAnimator.isRunning && !force) return false
+        if (overshootAnimator.isRunning && !force) return false
         if (totalProgressAnimator.isRunning && !force) return false
 
         val newProgress = progress + value
@@ -270,7 +271,7 @@ class ProgressMeterView @JvmOverloads constructor(
             progress = it.animatedValue as Int
         }
         val passedProgress = (outOfScale - maxProgress) / maxProgress
-        val speedForOvershooting = 5 * progressPerSecond
+        val speedForOvershooting = 10 * progressPerSecond
         val overshotDuration = (1000f * passedProgress / speedForOvershooting).toLong()
         overshootAnimator.duration = overshotDuration
         overshootAnimator.setIntValues(0, -outOfScale.toInt() + maxProgress)

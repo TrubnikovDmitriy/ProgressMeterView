@@ -5,32 +5,29 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.github.jinatonic.confetti.CommonConfetti
 import dagger.hilt.android.AndroidEntryPoint
 import dv.trubnikov.coolometer.BuildConfig
+import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.databinding.ActivityMainBinding
-import dv.trubnikov.coolometer.domain.cloud.CloudMessageQueue
-import dv.trubnikov.coolometer.domain.models.CloudMessageParser
 import dv.trubnikov.coolometer.domain.models.Message
-import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
 import dv.trubnikov.coolometer.ui.debug.ModalBottomSheet
+import dv.trubnikov.coolometer.ui.main.MainViewModel.Action
+import dv.trubnikov.coolometer.ui.main.MainViewModel.State
 import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
-import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
-    companion object {
-        private const val CMS_MARKER_KEY = "google.ttl"
-    }
-
-    @Inject
-    lateinit var messageQueue: CloudMessageQueue
 
     private val viewModel by viewModels<MainViewModel>()
     private val viewBinding by unsafeLazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -38,43 +35,38 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+        observeState()
         changeSizeOfConfetti()
         setupListeners()
     }
 
     override fun onStart() {
         super.onStart()
-        observeMessageQueue()
-        checkForNewMessage(intent)
+        viewModel.onMessageFromNotification(intent)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        checkForNewMessage(intent)
+        viewModel.onMessageFromNotification(intent)
     }
 
     private fun setupListeners() {
         viewBinding.progressMeter.overshootListener = OvershootListener { forward ->
             if (forward) showConfetti()
         }
-        viewBinding.root.setOnClickListener {
-//            handleMessage(FakeMessage())
-//            showDebugPanel()
-            viewModel.onClick()
-         }
-        viewBinding.root.setOnLongClickListener {
-            viewModel.onLongClick()
-            false
-         }
+        viewBinding.fab.setOnClickListener {
+            viewModel.onFabClick()
+        }
     }
 
     private fun handleMessage(message: Message) {
         with(viewBinding) {
-            floatingText.text = message.shortMessage
-            floatingText.animateFloating(root.width.toFloat(), progressMeter.bottom.toFloat())
-            explainText.text = message.longMessage
-            explainText.isVisible = true
-            progressMeter.addProgress(message.score, true)
+            val isReceived = progressMeter.addProgress(message.score, true)
+            if (isReceived) {
+                explainText.text = message.longMessage
+                explainText.isVisible = true
+                viewModel.markAsReceived(message)
+            }
         }
     }
 
@@ -99,30 +91,60 @@ class MainActivity : AppCompatActivity() {
             .animate()
     }
 
-    private fun observeMessageQueue() {
-        // TODO: replace on repeatOnLifecycle
-        lifecycleScope.launchWhenStarted {
-            messageQueue.messageFlow.collect {
-                handleMessage(it)
+    private fun observeState() {
+        // TODO: replace on normal repeatOnLifecycle
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.stateFlow.collect { state ->
+                    handleState(state)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.actionFlow.collect { state ->
+                    handleAction(state)
+                }
             }
         }
     }
 
-    private fun checkForNewMessage(intent: Intent?) {
-        if (intent?.hasExtra(CMS_MARKER_KEY) == true) {
-            intent.removeExtra(CMS_MARKER_KEY)
-            val message = CloudMessageParser.parse(intent)
-            if (message != null) {
-                handleMessage(message)
-            } else {
-                val error = IllegalStateException(
-                    """
-                    Не удалось распарсить интент intent=[$intent], 
-                    extras=[${intent.extras?.toString()}]
-                    """.trimIndent()
-                )
-                assertFail(error)
+    private fun handleState(state: State) {
+        when (state) {
+            is State.Success -> with(viewBinding) {
+                progressMeter.progress = state.progress
+                progressMeter.maxProgress = state.maxProgress
+                progressMeter.totalProgress = state.totalProgress
+                progressMeter.bigTickCount = state.bigTicks
+                progressMeter.smallTickCount = state.smallTicks
+                progressMeter.isVisible = true
+                fab.isVisible = state.unreceivedMessages.isNotEmpty()
+                fab.setIconResource(state.getIconForFab())
+                fab.setText(state.getTextForFab())
             }
+            is State.Error -> with(viewBinding) {
+                progressMeter.isVisible = false
+            }
+            is State.Loading -> with(viewBinding) {
+                progressMeter.isVisible = false
+            }
+        }
+    }
+
+    private fun handleAction(action: Action) {
+        when (action) {
+            is Action.AcceptDialog -> showAcceptMessage(action.message) { msg ->
+                handleMessage(msg)
+            }
+            is Action.NotificationDialog -> showNewMessageDialog(action.message) { msg ->
+                handleMessage(msg)
+            }
+            is Action.ListDialog -> showChoiceDialog(action.messages) { msg ->
+                showAcceptMessage(msg) {
+                    handleMessage(msg)
+                }
+            }
+            Action.PityDialog -> showPityDialog()
         }
     }
 
@@ -142,5 +164,29 @@ class MainActivity : AppCompatActivity() {
         val field = clazz.getDeclaredField("defaultConfettiSize")
         field.isAccessible = true
         field.setInt(null, 40)
+    }
+
+    @DrawableRes
+    private fun State.Success.getIconForFab(): Int {
+        return when (unreceivedMessages.size) {
+            1 -> R.drawable.ic_msg_1
+            2 -> R.drawable.ic_msg_2
+            3 -> R.drawable.ic_msg_3
+            4 -> R.drawable.ic_msg_4
+            5 -> R.drawable.ic_msg_5
+            6 -> R.drawable.ic_msg_6
+            7 -> R.drawable.ic_msg_7
+            8 -> R.drawable.ic_msg_8
+            9 -> R.drawable.ic_msg_9
+            else -> R.drawable.ic_msg_many
+        }
+    }
+
+    @StringRes
+    private fun State.Success.getTextForFab(): Int {
+        return when (unreceivedMessages.size) {
+            1 -> R.string.main_single_achievement
+            else -> R.string.main_many_achievements
+        }
     }
 }

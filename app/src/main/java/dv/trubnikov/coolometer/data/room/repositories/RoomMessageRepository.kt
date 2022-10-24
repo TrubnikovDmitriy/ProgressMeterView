@@ -1,6 +1,7 @@
 package dv.trubnikov.coolometer.data.room.repositories
 
 import android.database.sqlite.SQLiteException
+import androidx.annotation.WorkerThread
 import dv.trubnikov.coolometer.data.room.dao.MessageDao
 import dv.trubnikov.coolometer.data.room.tables.MessageEntity
 import dv.trubnikov.coolometer.domain.models.FirebaseMessage
@@ -13,10 +14,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class RoomMessageRepository @Inject constructor(
     private val messageDao: MessageDao,
 ) : MessageRepository {
+
+    @WorkerThread
+    override fun insertMessageBlocking(message: Message): Out<Unit> {
+        return try {
+            val entity = message.toEntity()
+            messageDao.insertMessageBlocking(entity)
+            Out.Success(Unit)
+        } catch (e: SQLiteException) {
+            Out.Failure(e)
+        }
+    }
 
     override suspend fun insertMessage(message: Message): Out<Unit> {
         return safeDatabaseRequest(Dispatchers.IO) {

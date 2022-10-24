@@ -10,12 +10,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertMessageBlocking(message: MessageEntity)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMessage(message: MessageEntity)
 
     @Query("SELECT * FROM messages WHERE is_received=0")
     fun getUnreceivedMessages(): Flow<List<MessageEntity>>
 
-    @Query("UPDATE messages SET is_received='TRUE' WHERE id=(:messageId)")
+    @Query("UPDATE messages SET is_received='1' WHERE id=(:messageId)")
     suspend fun markAsReceived(messageId: String)
 
     @Query("SELECT IFNULL(SUM(score), 0) FROM messages WHERE is_received=1")

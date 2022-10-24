@@ -2,6 +2,7 @@ package dv.trubnikov.coolometer.tools
 
 import android.graphics.Paint
 import android.graphics.Rect
+import java.lang.Float.min
 
 private val bounds = Rect()
 
@@ -15,7 +16,8 @@ private val bounds = Rect()
  *
  * @see <a href="https://stackoverflow.com/a/21895626/8173261">https://stackoverflow.com/a/21895626/8173261</a>
  */
-fun Paint.setTextSizeForHeight(
+fun Paint.setTextSizeForSize(
+    desiredWidth: Float,
     desiredHeight: Float,
     text: String,
 ) {
@@ -26,8 +28,9 @@ fun Paint.setTextSizeForHeight(
     getTextBounds(text, 0, text.length, bounds)
 
     // Calculate the desired size as a proportion of our testTextSize.
-    val desiredTextSize = testTextSize * desiredHeight / bounds.height()
+    val desiredTextSizeByHeight = testTextSize * desiredHeight / bounds.height()
+    val desiredTextSizeByWidth = testTextSize * desiredWidth / bounds.width()
 
     // Set the paint for that size.
-    textSize = desiredTextSize
+    textSize = min(desiredTextSizeByWidth, desiredTextSizeByHeight)
 }
