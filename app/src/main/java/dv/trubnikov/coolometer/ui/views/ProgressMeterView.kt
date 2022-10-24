@@ -15,6 +15,7 @@ import android.view.animation.BounceInterpolator
 import android.view.animation.LinearInterpolator
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.tools.getVibratorManager
+import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -57,13 +58,6 @@ class ProgressMeterView @JvmOverloads constructor(
             invalidate()
         }
 
-    var maxProgress: Int
-        get() = drawer.maxProgress
-        set(value) {
-            drawer.maxProgress = value
-            invalidate()
-        }
-
     var progress: Int
         get() = drawer.progress
         set(value) {
@@ -84,12 +78,10 @@ class ProgressMeterView @JvmOverloads constructor(
         ).use {
             val rawBigTickCount = it.getInteger(R.styleable.ProgressMeterView_bigTicksCount, 5)
             val rawSmallTickCount = it.getInteger(R.styleable.ProgressMeterView_smallTicksCount, 2)
-            val rawMaxProgress = it.getInteger(R.styleable.ProgressMeterView_maxProgress, 1_000)
             val rawGravity = it.getInteger(R.styleable.ProgressMeterView_gravity, 0)
 
             drawer.bigTickCount = rawBigTickCount.coerceIn(3, 6)
             drawer.smallTickCount = rawSmallTickCount.coerceIn(0, 10)
-            drawer.maxProgress = rawMaxProgress.coerceAtLeast(10)
             drawer.gravity = when(rawGravity) {
                 0 -> ProgressMeterDrawer.Gravity.CENTER
                 1 -> ProgressMeterDrawer.Gravity.TOP
@@ -120,11 +112,11 @@ class ProgressMeterView @JvmOverloads constructor(
         if (totalProgressAnimator.isRunning && !force) return false
 
         val newProgress = progress + value
-        val normalizeProgress = newProgress.coerceIn(0, maxProgress)
+        val normalizeProgress = newProgress.coerceIn(0, MAX_PROGRESS)
 
         // w/o animation
         if (!animate) {
-            progress = newProgress % maxProgress
+            progress = newProgress % MAX_PROGRESS
             totalProgress += value
             return true
         }
@@ -133,7 +125,7 @@ class ProgressMeterView @JvmOverloads constructor(
             backwardOvershootAnimation(value)
             return true
         }
-        if (progress == maxProgress && value > 0) {
+        if (progress == MAX_PROGRESS && value > 0) {
             forwardOvershootAnimation(value)
             return true
         }
@@ -148,22 +140,22 @@ class ProgressMeterView @JvmOverloads constructor(
             }
             progressAnimator.addListener(listener)
         }
-        if (newProgress > maxProgress) {
+        if (newProgress > MAX_PROGRESS) {
             val listener = object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animator: Animator) {
                     progressAnimator.removeListener(this)
-                    addProgress(newProgress - maxProgress, animate = true, force = true)
+                    addProgress(newProgress - MAX_PROGRESS, animate = true, force = true)
                 }
             }
             progressAnimator.addListener(listener)
         }
-        if (newProgress < 0 || maxProgress < newProgress) {
+        if (newProgress < 0 || MAX_PROGRESS < newProgress) {
             progressAnimator.interpolator = AccelerateInterpolator()
         } else {
             progressAnimator.interpolator = BounceInterpolator()
         }
 
-        val timeSeconds = abs(normalizeProgress - progress).toFloat() / maxProgress / progressPerSecond
+        val timeSeconds = abs(normalizeProgress - progress).toFloat() / MAX_PROGRESS / progressPerSecond
         val timeMilliseconds = (1000 * timeSeconds).toLong()
 
         progressAnimator.setIntValues(progress, normalizeProgress)
@@ -227,7 +219,7 @@ class ProgressMeterView @JvmOverloads constructor(
     }
 
     private fun backwardOvershootAnimation(value: Int) {
-        progress = maxProgress
+        progress = MAX_PROGRESS
         overshootListener?.onOvershoot(forward = false)
         backwardNeedleRotation {
             addProgress(value, animate = true, force = true)
@@ -242,17 +234,17 @@ class ProgressMeterView @JvmOverloads constructor(
                 onEndListener()
             }
         }
-        val outOfScale = 360 * maxProgress / (180f - 2 * drawer.degreeOffset)
+        val outOfScale = 360 * MAX_PROGRESS / (180f - 2 * drawer.degreeOffset)
         overshootAnimator.addListener(listener)
         overshootAnimator.addUpdateListener {
             progress = it.animatedValue as Int
         }
-        val passedProgress = (outOfScale - maxProgress) / maxProgress
+        val passedProgress = (outOfScale - MAX_PROGRESS) / MAX_PROGRESS
         val speedForOvershooting = 10 * progressPerSecond
         val overshotDuration = (1000f * passedProgress / speedForOvershooting).toLong()
         val vibration = VibrationEffect.createOneShot(overshotDuration, 200)
         overshootAnimator.duration = overshotDuration
-        overshootAnimator.setIntValues(maxProgress, outOfScale.toInt())
+        overshootAnimator.setIntValues(MAX_PROGRESS, outOfScale.toInt())
         vibrator.defaultVibrator.vibrate(vibration)
         overshootAnimator.start()
     }
@@ -261,20 +253,20 @@ class ProgressMeterView @JvmOverloads constructor(
         val listener = object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 overshootAnimator.removeListener(this)
-                progress = maxProgress
+                progress = MAX_PROGRESS
                 onEndListener()
             }
         }
-        val outOfScale = 360 * maxProgress / (180f - 2 * drawer.degreeOffset)
+        val outOfScale = 360 * MAX_PROGRESS / (180f - 2 * drawer.degreeOffset)
         overshootAnimator.addListener(listener)
         overshootAnimator.addUpdateListener {
             progress = it.animatedValue as Int
         }
-        val passedProgress = (outOfScale - maxProgress) / maxProgress
+        val passedProgress = (outOfScale - MAX_PROGRESS) / MAX_PROGRESS
         val speedForOvershooting = 10 * progressPerSecond
         val overshotDuration = (1000f * passedProgress / speedForOvershooting).toLong()
         overshootAnimator.duration = overshotDuration
-        overshootAnimator.setIntValues(0, -outOfScale.toInt() + maxProgress)
+        overshootAnimator.setIntValues(0, -outOfScale.toInt() + MAX_PROGRESS)
         overshootAnimator.start()
     }
 

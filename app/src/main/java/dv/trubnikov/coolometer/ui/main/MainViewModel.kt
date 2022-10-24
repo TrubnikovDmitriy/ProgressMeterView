@@ -10,6 +10,7 @@ import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.tools.OneshotValueFlow
 import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.getOrThrow
+import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import dv.trubnikov.coolometer.ui.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -102,15 +103,13 @@ class MainViewModel @Inject constructor(
     private suspend fun createSuccessState(messages: List<Message>): State.Success {
         val bigTicks = 5
         val smallTicks = 2
-        val maxProgress = 1000
         val totalProgress = messageRepository.getTotalScore().getOrThrow()
-        val progress = totalProgress % maxProgress
+        val progress = totalProgress % MAX_PROGRESS
         return State.Success(
             bigTicks = bigTicks,
             smallTicks = smallTicks,
             progress = progress,
             totalProgress = totalProgress,
-            maxProgress = maxProgress,
             unreceivedMessages = messages,
         )
     }
@@ -132,7 +131,6 @@ class MainViewModel @Inject constructor(
             val smallTicks: Int,
             val progress: Int,
             val totalProgress: Int,
-            val maxProgress: Int,
             val unreceivedMessages: List<Message>,
         ) : State
     }

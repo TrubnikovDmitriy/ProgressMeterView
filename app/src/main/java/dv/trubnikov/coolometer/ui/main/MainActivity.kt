@@ -113,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         when (state) {
             is State.Success -> with(viewBinding) {
                 progressMeter.progress = state.progress
-                progressMeter.maxProgress = state.maxProgress
                 progressMeter.totalProgress = state.totalProgress
                 progressMeter.bigTickCount = state.bigTicks
                 progressMeter.smallTickCount = state.smallTicks

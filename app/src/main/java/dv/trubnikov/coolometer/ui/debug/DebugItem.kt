@@ -3,7 +3,6 @@ package dv.trubnikov.coolometer.ui.debug
 import androidx.annotation.ArrayRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import dv.trubnikov.coolometer.R
 
 sealed class DebugItem(val viewType: Int) {
 

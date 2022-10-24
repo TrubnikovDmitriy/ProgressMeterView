@@ -14,7 +14,6 @@ import dv.trubnikov.coolometer.tools.withMathCoordinates
 class ProgressMeterDrawer(
     private val context: Context,
     var progress: Int = 0,
-    var maxProgress: Int = 1000,
     var totalProgress: Int = progress,
     var smallTickCount: Int = 2,
     var bigTickCount: Int = 5,
@@ -22,6 +21,10 @@ class ProgressMeterDrawer(
     var gravity: Gravity = Gravity.CENTER,
     val widthHeightRatio: Float = 3f / 2f,
 ) {
+
+    companion object {
+        val MAX_PROGRESS: Int = 1000
+    }
 
     enum class Gravity { CENTER, TOP, BOTTOM }
 
@@ -89,7 +92,7 @@ class ProgressMeterDrawer(
 
     private val normalizeProgress: Float
         @FloatRange(from = -1.0, to = 1.0)
-        get() = progress.toFloat() / maxProgress
+        get() = progress.toFloat() / MAX_PROGRESS
 
     fun setSize(width: Int, height: Int) {
         // It defines sizes that depend on the size of this view

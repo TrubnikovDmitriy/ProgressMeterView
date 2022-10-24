@@ -12,9 +12,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.tools.getAppWidgetManager
-import dv.trubnikov.coolometer.tools.getOrThrow
 import dv.trubnikov.coolometer.ui.main.MainActivity
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer
+import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -49,10 +49,8 @@ class WidgetUpdater @Inject constructor(
     private fun createRemoteView(totalProgress: Int): RemoteViews {
         bitmap.eraseColor(Color.TRANSPARENT)
         val remoteView = RemoteViews(appContext.packageName, R.layout.progress_meter_widget)
-        val maxProgress = 1000
         val progressMeterDrawer = ProgressMeterDrawer(appContext).apply {
-            this.progress = totalProgress % maxProgress
-            this.maxProgress = maxProgress
+            this.progress = totalProgress % MAX_PROGRESS
             this.totalProgress = totalProgress
         }
         progressMeterDrawer.draw(Canvas(bitmap), bitmap.width, bitmap.height)

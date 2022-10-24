@@ -3,7 +3,6 @@
     <declare-styleable name="ProgressMeterView">
         <attr name="bigTicksCount" format="integer" />
         <attr name="smallTicksCount" format="integer" />
-        <attr name="maxProgress" format="integer" />
         <attr name="gravity" format="enum">
             <enum name="center" value="0"/>
             <enum name="top" value="1"/>
