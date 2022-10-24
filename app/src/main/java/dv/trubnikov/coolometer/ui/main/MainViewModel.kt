@@ -8,7 +8,6 @@ import dv.trubnikov.coolometer.domain.models.CloudMessageParser
 import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.tools.OneshotValueFlow
-import dv.trubnikov.coolometer.tools.assertFail
 import dv.trubnikov.coolometer.tools.getOrThrow
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import dv.trubnikov.coolometer.ui.widget.WidgetUpdater
@@ -77,13 +76,10 @@ class MainViewModel @Inject constructor(
                 if (message != null) {
                     onMessageFromNotification(message)
                 } else {
-                    val error = IllegalStateException(
-                        """
-                    Не удалось распарсить интент intent=[$intent], 
-                    extras=[${intent.extras?.toString()}]
-                    """.trimIndent()
+                    Timber.e(
+                        "Не удалось распарсить интент intent=[$intent]," +
+                        " extras=[${intent.extras?.toString()}]"
                     )
-                    assertFail(error)
                 }
             }
         }
