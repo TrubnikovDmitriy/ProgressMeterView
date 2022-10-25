@@ -1,5 +1,6 @@
 package dv.trubnikov.coolometer.ui.screens.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -22,6 +23,8 @@ import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
 import dv.trubnikov.coolometer.ui.screens.debug.ModalBottomSheet
+import dv.trubnikov.coolometer.ui.screens.debug.SecretClickListener
+import dv.trubnikov.coolometer.ui.screens.debug.SecretClickListener.Tap
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.Action
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.State
 import dv.trubnikov.coolometer.ui.screens.permissions.PermissionActivity
@@ -54,12 +57,19 @@ class MainActivity : AppCompatActivity() {
         viewModel.onMessageFromNotification(intent)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners() {
-        viewBinding.progressMeter.overshootListener = OvershootListener { forward ->
-            if (forward) showConfetti()
-        }
-        viewBinding.fab.setOnClickListener {
-            viewModel.onFabClick()
+        with(viewBinding) {
+            progressMeter.overshootListener = OvershootListener { forward ->
+                if (forward) showConfetti()
+            }
+            fab.setOnClickListener {
+                viewModel.onFabClick()
+            }
+            val debugClickListener = SecretClickListener(
+                Tap.TOP, Tap.BOTTOM, Tap.RIGHT, Tap.LEFT
+            ) { showDebugPanel() }
+            debugListener.setOnTouchListener(debugClickListener)
         }
     }
 
