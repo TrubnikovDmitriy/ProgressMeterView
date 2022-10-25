@@ -1,4 +1,4 @@
-package dv.trubnikov.coolometer.ui.debug
+package dv.trubnikov.coolometer.ui.screens.debug
 
 import androidx.annotation.ArrayRes
 import androidx.annotation.DrawableRes

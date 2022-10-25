@@ -1,4 +1,4 @@
-package dv.trubnikov.coolometer.ui.debug
+package dv.trubnikov.coolometer.ui.screens.debug
 
 import android.annotation.SuppressLint
 import android.os.Bundle

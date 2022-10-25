@@ -1,11 +1,11 @@
-package dv.trubnikov.coolometer.ui.debug
+package dv.trubnikov.coolometer.ui.screens.debug
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import dv.trubnikov.coolometer.ui.debug.viewholders.DebugButtonViewHolder
-import dv.trubnikov.coolometer.ui.debug.viewholders.DebugSpinnerViewHolder
-import dv.trubnikov.coolometer.ui.debug.viewholders.DebugSwitchViewHolder
+import dv.trubnikov.coolometer.ui.screens.debug.viewholders.DebugButtonViewHolder
+import dv.trubnikov.coolometer.ui.screens.debug.viewholders.DebugSpinnerViewHolder
+import dv.trubnikov.coolometer.ui.screens.debug.viewholders.DebugSwitchViewHolder
 
 class DebugRecyclerAdapter(
     private val items: List<DebugItem>

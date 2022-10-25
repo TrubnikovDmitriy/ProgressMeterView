@@ -1,10 +1,10 @@
-package dv.trubnikov.coolometer.ui.debug.viewholders
+package dv.trubnikov.coolometer.ui.screens.debug.viewholders
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import dv.trubnikov.coolometer.databinding.VhDebugButtonBinding
 import dv.trubnikov.coolometer.tools.layoutInflater
-import dv.trubnikov.coolometer.ui.debug.DebugItem
+import dv.trubnikov.coolometer.ui.screens.debug.DebugItem
 
 class DebugButtonViewHolder private constructor(
     private val item: VhDebugButtonBinding

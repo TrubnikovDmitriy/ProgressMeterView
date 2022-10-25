@@ -1,4 +1,4 @@
-package dv.trubnikov.coolometer.ui.main
+package dv.trubnikov.coolometer.ui.screens.main
 
 import android.app.Activity
 import android.text.SpannableStringBuilder

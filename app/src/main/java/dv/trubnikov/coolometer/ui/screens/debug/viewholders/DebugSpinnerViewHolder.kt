@@ -1,4 +1,4 @@
-package dv.trubnikov.coolometer.ui.debug.viewholders
+package dv.trubnikov.coolometer.ui.screens.debug.viewholders
 
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import dv.trubnikov.coolometer.databinding.VhDebugSpinnerBinding
 import dv.trubnikov.coolometer.tools.layoutInflater
-import dv.trubnikov.coolometer.ui.debug.DebugItem
+import dv.trubnikov.coolometer.ui.screens.debug.DebugItem
 
 class DebugSpinnerViewHolder private constructor(
     private val item: VhDebugSpinnerBinding

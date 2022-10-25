@@ -11,7 +11,7 @@ import android.widget.RemoteViews
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.tools.getAppWidgetManager
-import dv.trubnikov.coolometer.ui.main.MainActivity
+import dv.trubnikov.coolometer.ui.screens.main.MainActivity
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import timber.log.Timber

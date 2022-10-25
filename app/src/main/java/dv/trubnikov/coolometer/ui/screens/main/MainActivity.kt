@@ -1,4 +1,4 @@
-package dv.trubnikov.coolometer.ui.main
+package dv.trubnikov.coolometer.ui.screens.main
 
 import android.content.Intent
 import android.graphics.Color
@@ -20,9 +20,9 @@ import dv.trubnikov.coolometer.databinding.ActivityMainBinding
 import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
-import dv.trubnikov.coolometer.ui.debug.ModalBottomSheet
-import dv.trubnikov.coolometer.ui.main.MainViewModel.Action
-import dv.trubnikov.coolometer.ui.main.MainViewModel.State
+import dv.trubnikov.coolometer.ui.screens.debug.ModalBottomSheet
+import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.Action
+import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.State
 import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
 import kotlinx.coroutines.launch
 
