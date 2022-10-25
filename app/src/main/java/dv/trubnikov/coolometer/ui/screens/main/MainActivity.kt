@@ -1,5 +1,6 @@
 package dv.trubnikov.coolometer.ui.screens.main
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -23,6 +24,8 @@ import dv.trubnikov.coolometer.tools.unsafeLazy
 import dv.trubnikov.coolometer.ui.screens.debug.ModalBottomSheet
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.Action
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.State
+import dv.trubnikov.coolometer.ui.screens.permissions.PermissionActivity
+import dv.trubnikov.coolometer.ui.screens.permissions.PermissionActivity.Companion.checkNotificationPermission
 import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
 import kotlinx.coroutines.launch
 
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+        checkForNotificationPermissions()
         observeState()
         changeSizeOfConfetti()
         setupListeners()
@@ -154,7 +158,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkForNotificationPermissions() {
-        // TODO: Permissions
+        if (!checkNotificationPermission(this)) {
+            val permissionActivity = PermissionActivity.intentForActivity(this)
+            startActivity(permissionActivity)
+            finish()
+        }
     }
 
     private fun changeSizeOfConfetti() {
@@ -186,6 +194,12 @@ class MainActivity : AppCompatActivity() {
         return when (unreceivedMessages.size) {
             1 -> R.string.main_single_achievement
             else -> R.string.main_many_achievements
+        }
+    }
+
+    companion object {
+        fun intentForActivity(context: Context): Intent {
+            return Intent(context, MainActivity::class.java)
         }
     }
 }

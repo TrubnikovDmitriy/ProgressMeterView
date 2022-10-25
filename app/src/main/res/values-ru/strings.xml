@@ -29,4 +29,15 @@
     <string name="debug_panel_small_ticks_count">Размер маленькой шкалы крутометра</string>
     <string name="debug_panel_copy_token">Скопировать токен</string>
     <string name="debug_panel_copy_token_label">Токен скопирован</string>
+
+    <string name="permissions_rational_title">Будь в курсе!</string>
+    <string name="permissions_rational_text">Чтобы получать напоминание о своей крутости, нужно разрешить показ уведомлений</string>
+    <string name="permissions_rational_angry_title">Не понял</string>
+    <string name="permissions_rational_angry_text">Что значит &#171;Неть&#187;?\nНадо на &#171;Разрешить&#187; нажать</string>
+    <string name="permissions_rational_very_angry_title">Серьёзно?</string>
+    <string name="permissions_rational_very_angry_text">Вообще запретила показ запроса пермишенов? Ну, теперь сама лезь в настройки</string>
+    <string name="permission_button_settings">Открыть настройки</string>
+    <string name="permission_button_grant">Разрешить</string>
+    <string name="permission_button_deny">Неть</string>
+
 </resources>

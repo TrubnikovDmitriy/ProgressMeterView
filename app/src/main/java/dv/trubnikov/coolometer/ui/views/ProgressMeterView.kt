@@ -227,7 +227,7 @@ class ProgressMeterView @JvmOverloads constructor(
 
     private fun forwardNeedleRotation(onEndListener: () -> Unit) {
         val listener = object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 overshootAnimator.removeListener(this)
                 progress = 0
                 onEndListener()
@@ -250,7 +250,7 @@ class ProgressMeterView @JvmOverloads constructor(
 
     private fun backwardNeedleRotation(onEndListener: () -> Unit) {
         val listener = object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 overshootAnimator.removeListener(this)
                 progress = MAX_PROGRESS
                 onEndListener()

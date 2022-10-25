@@ -24,6 +24,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.screens.permissions.PermissionActivity"
+            android:exported="false">
+        </activity>
+
         <service
             android:name=".data.cloud.CloudMessagingService"
             android:exported="false">
@@ -49,13 +54,13 @@
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
             tools:node="merge">
+
             <!-- Disable default configuration for WorkManager -->
             <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
-
     </application>
 
 </manifest>

@@ -45,7 +45,7 @@ class CloudTokenProvider @Inject constructor(
 
     @SuppressLint("LogNotTimber") // Timber is not initialized yet
     private fun sendTokenToAnalytics(token: String) {
-        Log.i("CloudTokenProvider", "Set token = ${token.length}")
+        Log.i("CloudTokenProvider", "Set token (${token.length}) = [$token]")
         firebaseCrashlytics.setUserId(token)
         firebaseCrashlytics.recordException(RuntimeException("Fake exception"))
     }
