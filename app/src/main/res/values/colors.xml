@@ -6,8 +6,8 @@
     <color name="secondaryColor">#f9a825</color>
     <color name="secondaryLightColor">#ffd95a</color>
     <color name="secondaryDarkColor">#c17900</color>
-    <color name="primaryTextColor">#000000</color>
-    <color name="secondaryTextColor">#000000</color>
+    <color name="primaryTextColor">#2E2E2E</color>
+    <color name="secondaryTextColor">#4A4A4A</color>
 
     <color name="ic_launcher_background">@color/primaryLightColor</color>
 

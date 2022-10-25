@@ -16,10 +16,10 @@
     <string name="alert_dialog_already_received_text">Ты уже получала баллы за это достижение</string>
     <string name="alert_dialog_choice_title">Доступные достижения, которые ещё не получены:</string>
     <plurals name="alert_dialog_received_score">
-        <item quantity="one">%1$s балл</item>
-        <item quantity="few">%1$s балла</item>
-        <item quantity="many">%1$s баллов</item>
-        <item quantity="other">%1$s баллов</item>
+        <item quantity="one">%1$s&#160;балл</item>
+        <item quantity="few">%1$s&#160;балла</item>
+        <item quantity="many">%1$s&#160;баллов</item>
+        <item quantity="other">%1$s&#160;баллов</item>
     </plurals>
 
     <string name="debug_panel_title">Дебаг панель</string>

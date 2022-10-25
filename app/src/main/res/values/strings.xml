@@ -16,8 +16,8 @@
     <string name="alert_dialog_already_received_text">You have already received score for this message</string>
     <string name="alert_dialog_choice_title">You have several messages</string>
     <plurals name="alert_dialog_received_score">
-        <item quantity="one">%1$s point</item>
-        <item quantity="other">%1$s points</item>
+        <item quantity="one">%1$s&#160;point</item>
+        <item quantity="other">%1$s&#160;points</item>
     </plurals>
 
     <string name="debug_panel_title">Debug panel</string>

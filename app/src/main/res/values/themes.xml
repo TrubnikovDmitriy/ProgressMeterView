@@ -1,10 +1,21 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Theme.Coolometer" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorOnPrimary">@color/primaryLightColor</item>
+        <item name="colorOnPrimary">@color/secondaryDarkColor</item>
         <item name="colorPrimaryVariant">@color/primaryDarkColor</item>
         <item name="colorSecondary">@color/secondaryLightColor</item>
-        <item name="colorOnSecondary">@color/secondaryColor</item>
+        <item name="colorOnSecondary">@color/primaryTextColor</item>
         <item name="colorSecondaryVariant">@color/secondaryDarkColor</item>
+    </style>
+
+    <!-- Alert Dialogs -->
+    <!-- https://github.com/material-components/material-components-android/blob/master/docs/components/Dialog.md#implementing-dialog-theming -->
+    <style name="Cool.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/secondaryColor</item> <!-- Main color -->
+        <item name="colorSecondary">@color/secondaryDarkColor</item> <!-- Checkbox color -->
+        <item name="colorOnSurface">@color/secondaryDarkColor</item> <!-- Title color -->
+        <item name="materialAlertDialogTitleTextStyle">@style/Cool.MaterialAlertDialog.Title.Text</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Cool.MaterialAlertDialog.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Cool.MaterialAlertDialog.Button</item>
     </style>
 </resources>
