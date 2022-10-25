@@ -1,5 +1,7 @@
 package dv.trubnikov.coolometer.ui.screens.main
 
+import android.content.ClipData
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,15 +9,15 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dv.trubnikov.coolometer.R
+import dv.trubnikov.coolometer.domain.cloud.CloudTokenProvider
+import dv.trubnikov.coolometer.domain.models.FakeMessage
 import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.domain.parsers.MessageParser
 import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.domain.workers.UpdateWidgetWorker
-import dv.trubnikov.coolometer.tools.OneshotValueFlow
-import dv.trubnikov.coolometer.tools.getOr
-import dv.trubnikov.coolometer.tools.getOrThrow
-import dv.trubnikov.coolometer.tools.logError
+import dv.trubnikov.coolometer.tools.*
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import dv.trubnikov.coolometer.ui.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -30,10 +32,14 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
+    private val tokenProvider: CloudTokenProvider,
     private val widgetUpdater: WidgetUpdater,
     private val workManager: WorkManager,
     private val parser: MessageParser,
 ) : ViewModel() {
+
+    var debugButtonEnable: Boolean = false
+        private set
 
     val stateFlow = MutableStateFlow<State>(State.Loading)
     val actionFlow = OneshotValueFlow<Action>()
@@ -93,6 +99,52 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun debugCopyToken(context: Context) {
+        viewModelScope.launch {
+            val token = tokenProvider.getToken()
+            val label = context.getString(R.string.debug_panel_copy_token_label)
+            val clip = ClipData.newPlainText(label, token)
+            context.getClipboardManager().setPrimaryClip(clip)
+        }
+    }
+
+    fun debugSetBigTicks(ticks: Int) {
+        viewModelScope.launch {
+        }
+    }
+
+    fun debugSetSmallTicks(ticks: Int) {
+        viewModelScope.launch {
+        }
+    }
+
+    fun debugToggleCoolButtons(isEnabled: Boolean) {
+        viewModelScope.launch {
+            debugButtonEnable = isEnabled
+            val success = stateFlow.value as? State.Success
+            if (success != null) {
+                stateFlow.value = success.copy(debugButtonEnable = isEnabled)
+            }
+        }
+    }
+
+    fun debugSendFakeNotification() {
+        viewModelScope.launch {
+        }
+    }
+
+    fun debugDropConfetti() {
+        viewModelScope.launch {
+            actionFlow.emit(Action.DebugConfetti)
+        }
+    }
+
+    fun debugAddFakeMessage() {
+        viewModelScope.launch {
+            messageRepository.insertMessage(FakeMessage())
+        }
+    }
+
     private suspend fun onMessageFromNotification(message: Message) {
         messageRepository.insertMessage(message)
         val messages = messageRepository.getUnreceivedMessages().first()
@@ -115,6 +167,7 @@ class MainViewModel @Inject constructor(
             progress = progress,
             totalProgress = totalProgress,
             unreceivedMessages = messages,
+            debugButtonEnable = debugButtonEnable,
         )
     }
 
@@ -136,6 +189,7 @@ class MainViewModel @Inject constructor(
         class AcceptDialog(val message: Message) : Action
         class ListDialog(val messages: List<Message>) : Action
         object PityDialog : Action
+        object DebugConfetti : Action
     }
 
     sealed interface State {
@@ -149,6 +203,7 @@ class MainViewModel @Inject constructor(
             val progress: Int,
             val totalProgress: Int,
             val unreceivedMessages: List<Message>,
+            val debugButtonEnable: Boolean,
         ) : State
     }
 

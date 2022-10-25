@@ -22,7 +22,7 @@ import dv.trubnikov.coolometer.databinding.ActivityMainBinding
 import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.tools.reverse
 import dv.trubnikov.coolometer.tools.unsafeLazy
-import dv.trubnikov.coolometer.ui.screens.debug.ModalBottomSheet
+import dv.trubnikov.coolometer.ui.screens.debug.DebugBottomSheet
 import dv.trubnikov.coolometer.ui.screens.debug.SecretClickListener
 import dv.trubnikov.coolometer.ui.screens.debug.SecretClickListener.Tap
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.Action
@@ -66,9 +66,16 @@ class MainActivity : AppCompatActivity() {
             fab.setOnClickListener {
                 viewModel.onFabClick()
             }
-            val debugClickListener = SecretClickListener(
-                Tap.TOP, Tap.BOTTOM, Tap.RIGHT, Tap.LEFT
-            ) { showDebugPanel() }
+            debugCoolButton.setOnClickListener {
+                val score = debugCoolNumber.text.toString().toIntOrNull()
+                if (score != null) {
+                    progressMeter.addProgress(score, animate = true)
+                }
+            }
+            val debugTaps = listOf(Tap.CENTER, Tap.CENTER, Tap.CENTER)
+            val debugClickListener = SecretClickListener(debugTaps) {
+                showDebugPanel()
+            }
             debugListener.setOnTouchListener(debugClickListener)
         }
     }
@@ -131,6 +138,8 @@ class MainActivity : AppCompatActivity() {
                 progressMeter.bigTickCount = state.bigTicks
                 progressMeter.smallTickCount = state.smallTicks
                 progressMeter.isVisible = true
+                debugCoolEdit.isVisible = state.debugButtonEnable
+                debugCoolButton.isVisible = state.debugButtonEnable
                 fab.isVisible = state.unreceivedMessages.isNotEmpty()
                 fab.setIconResource(state.getIconForFab())
                 fab.setText(state.getTextForFab())
@@ -158,13 +167,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             Action.PityDialog -> showPityDialog()
+            Action.DebugConfetti -> showConfetti()
         }
     }
 
     private fun showDebugPanel() {
         if (!BuildConfig.DEBUG) return
-        val modalBottomSheet = ModalBottomSheet()
-        modalBottomSheet.show(supportFragmentManager, null)
+        val debugPanel = DebugBottomSheet()
+        debugPanel.show(supportFragmentManager, null)
     }
 
     private fun checkForNotificationPermissions() {

@@ -22,6 +22,7 @@ class DebugSwitchViewHolder private constructor(
 
     fun onBind(type: DebugItem.Switch) {
         item.debugButtonText.setText(type.text)
+        item.debugSwitch.isChecked = type.isChecked
         item.debugSwitch.setOnClickListener {
             type.listener.onSwitch(item.debugSwitch.isChecked)
         }

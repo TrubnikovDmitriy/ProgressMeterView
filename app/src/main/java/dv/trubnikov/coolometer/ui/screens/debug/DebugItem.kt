@@ -18,6 +18,7 @@ sealed class DebugItem(val viewType: Int) {
 
     data class Switch(
         @StringRes val text: Int,
+        val isChecked: Boolean,
         val listener: Listener,
     ) : DebugItem(viewType = 1) {
         fun interface Listener {

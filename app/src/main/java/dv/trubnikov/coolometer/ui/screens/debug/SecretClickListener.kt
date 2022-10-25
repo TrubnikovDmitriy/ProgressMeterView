@@ -39,8 +39,8 @@ class SecretClickListener(
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-        if (event.action != MotionEvent.ACTION_UP) {
-            return true
+        if (event.action != MotionEvent.ACTION_DOWN) {
+            return false
         }
         v.performClick()
         handler.removeCallbacks(flushTask)
@@ -82,7 +82,7 @@ class SecretClickListener(
         } else {
             handler.postDelayed(flushTask, FLUSH_TIMER_MS)
         }
-        return true
+        return false
     }
 
     private fun identifyTheTap(v: View, event: MotionEvent): Tap {

@@ -22,8 +22,12 @@
         <item quantity="other">%1$s&#160;баллов</item>
     </plurals>
 
+    <string name="debug_cool_button_text">Накрутить!</string>
+    <string name="debug_cool_button_hint">Накрутка баллов</string>
     <string name="debug_panel_title">Дебаг панель</string>
     <string name="debug_panel_fake_notification">Отправить фейковое уведомление</string>
+    <string name="debug_panel_fake_message">Добавить фейковое достижение</string>
+    <string name="debug_panel_confetti">Выбросить конфетти</string>
     <string name="debug_panel_enable_buttons">Включить дебажные кнопки</string>
     <string name="debug_panel_big_ticks_count">Размер большой шкалы крутометра</string>
     <string name="debug_panel_small_ticks_count">Размер маленькой шкалы крутометра</string>

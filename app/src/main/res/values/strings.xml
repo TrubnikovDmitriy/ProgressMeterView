@@ -20,8 +20,12 @@
         <item quantity="other">%1$s&#160;points</item>
     </plurals>
 
+    <string name="debug_cool_button_text">Cheat up!</string>
+    <string name="debug_cool_button_hint">Cheat points</string>
     <string name="debug_panel_title">Debug panel</string>
     <string name="debug_panel_fake_notification">Send fake notification</string>
+    <string name="debug_panel_fake_message">Add fake message</string>
+    <string name="debug_panel_confetti">Drop confetti</string>
     <string name="debug_panel_enable_buttons">Enable debug buttons</string>
     <string name="debug_panel_big_ticks_count">Big ticks count</string>
     <string name="debug_panel_small_ticks_count">Small ticks count</string>

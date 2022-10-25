@@ -1,20 +1,25 @@
 package dv.trubnikov.coolometer.ui.screens.debug
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.tools.unsafeLazy
+import dv.trubnikov.coolometer.ui.screens.main.MainViewModel
 
-class ModalBottomSheet : BottomSheetDialogFragment() {
+class DebugBottomSheet : BottomSheetDialogFragment() {
 
+    private val viewModel: MainViewModel by unsafeLazy {
+        requireActivity().viewModels<MainViewModel>().value
+    }
     private val debugRecycler: RecyclerView by unsafeLazy {
         requireView().findViewById(R.id.debug_recycler)
     }
@@ -40,34 +45,56 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupRecycler()
+        setupRecycler(view.context)
     }
 
-    private fun setupRecycler() {
+    private fun setupRecycler(context: Context) {
+        val addMessage = DebugItem.Button(R.string.debug_panel_fake_message, R.drawable.ic_message) {
+            viewModel.debugAddFakeMessage()
+            dismiss()
+        }
         val sendNotification = DebugItem.Button(R.string.debug_panel_fake_notification, R.drawable.ic_notification) {
-            Toast.makeText(requireContext(), "sendNotification", Toast.LENGTH_SHORT).show()
+            viewModel.debugSendFakeNotification()
         }
-        val enableButtons = DebugItem.Switch(R.string.debug_panel_enable_buttons) { isChecked ->
-            Toast.makeText(requireContext(), "enableButtons-$isChecked", Toast.LENGTH_SHORT).show()
-
+        val dropConfetti = DebugItem.Button(R.string.debug_panel_confetti, R.drawable.ic_firework) {
+            viewModel.debugDropConfetti()
+            dismiss()
         }
-        val bigTicksCount = DebugItem.Spinner(R.string.debug_panel_big_ticks_count, R.array.debug_panel_big_ticks_spinner) { value ->
-            Toast.makeText(requireContext(), "bigTicksCount-$value", Toast.LENGTH_SHORT).show()
+        val enableButtons = DebugItem.Switch(
+            R.string.debug_panel_enable_buttons,
+            viewModel.debugButtonEnable,
+        ) { isChecked ->
+            viewModel.debugToggleCoolButtons(isChecked)
         }
-        val smallTicksCount = DebugItem.Spinner(R.string.debug_panel_small_ticks_count, R.array.debug_panel_small_ticks_spinner) { value ->
-            Toast.makeText(requireContext(), "smallTicksCount-$value", Toast.LENGTH_SHORT).show()
+        val bigTickArray = context.resources.getIntArray(R.array.debug_panel_big_ticks_spinner)
+        val bigTicksCount = DebugItem.Spinner(
+            R.string.debug_panel_big_ticks_count,
+            R.array.debug_panel_big_ticks_spinner
+        ) { index ->
+            val ticks = bigTickArray[index]
+            viewModel.debugSetBigTicks(ticks)
+        }
+        val smallTickArray = context.resources.getIntArray(R.array.debug_panel_small_ticks_spinner)
+        val smallTicksCount = DebugItem.Spinner(
+            R.string.debug_panel_small_ticks_count,
+            R.array.debug_panel_small_ticks_spinner
+        ) { index ->
+            val ticks = smallTickArray[index]
+            viewModel.debugSetSmallTicks(ticks)
         }
         val copyToken = DebugItem.Button(R.string.debug_panel_copy_token, R.drawable.ic_copy) {
-            Toast.makeText(requireContext(), "sendNotification", Toast.LENGTH_SHORT).show()
+            viewModel.debugCopyToken(context)
         }
         val adapter = DebugRecyclerAdapter(
+            addMessage,
             sendNotification,
+            dropConfetti,
             enableButtons,
             bigTicksCount,
             smallTicksCount,
             copyToken,
         )
-        debugRecycler.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        debugRecycler.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         debugRecycler.adapter = adapter
     }
 }
