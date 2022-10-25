@@ -106,7 +106,6 @@ class ProgressMeterView @JvmOverloads constructor(
     }
 
     private fun addProgress(value: Int, animate: Boolean = false, force: Boolean = false): Boolean {
-        if (value == 0) return true
         if (progressAnimator.isRunning && !force) return false
         if (overshootAnimator.isRunning && !force) return false
         if (totalProgressAnimator.isRunning && !force) return false
@@ -125,7 +124,7 @@ class ProgressMeterView @JvmOverloads constructor(
             backwardOvershootAnimation(value)
             return true
         }
-        if (progress == MAX_PROGRESS && value > 0) {
+        if (progress == MAX_PROGRESS && value >= 0) {
             forwardOvershootAnimation(value)
             return true
         }
@@ -140,7 +139,7 @@ class ProgressMeterView @JvmOverloads constructor(
             }
             progressAnimator.addListener(listener)
         }
-        if (newProgress > MAX_PROGRESS) {
+        if (newProgress >= MAX_PROGRESS) {
             val listener = object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animator: Animator) {
                     progressAnimator.removeListener(this)
