@@ -173,7 +173,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showDebugPanel() {
-        if (!BuildConfig.DEBUG) return
         val debugPanel = DebugBottomSheet()
         debugPanel.show(supportFragmentManager, null)
     }

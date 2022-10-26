@@ -29,6 +29,7 @@ sealed class DebugItem(val viewType: Int) {
     data class Spinner(
         @StringRes val text: Int,
         @ArrayRes val array: Int,
+        val initValue: Int,
         val listener: Listener,
     ) : DebugItem(viewType = 2) {
         fun interface Listener {

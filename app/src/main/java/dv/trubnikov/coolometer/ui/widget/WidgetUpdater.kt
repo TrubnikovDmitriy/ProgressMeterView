@@ -27,8 +27,8 @@ class WidgetUpdater @Inject constructor(
         Bitmap.createBitmap(WIDGET_WIDTH, WIDGET_HEIGHT, Bitmap.Config.ARGB_8888, true)
     }
 
-    fun updateAllWidgets(totalProgress: Int) {
-        val remoteView = createRemoteView(totalProgress)
+    fun updateAllWidgets(totalProgress: Int, smallTicks: Int, bigTicks: Int) {
+        val remoteView = createRemoteView(totalProgress, smallTicks, bigTicks)
         val widgetManager = appContext.getAppWidgetManager()
         val widgetIds = widgetManager.getAppWidgetIds(ComponentName(appContext, ProgressMeterWidget::class.java))
         for (widgetId in widgetIds) {
@@ -37,21 +37,14 @@ class WidgetUpdater @Inject constructor(
         }
     }
 
-    fun updateWidgets(totalProgress: Int, vararg widgetIds: Int) {
-        if (widgetIds.isEmpty()) return
-        val remoteView = createRemoteView(totalProgress)
-        val widgetManager = appContext.getAppWidgetManager()
-        for (widgetId in widgetIds) {
-            widgetManager.updateAppWidget(widgetId, remoteView)
-        }
-    }
-
-    private fun createRemoteView(totalProgress: Int): RemoteViews {
+    private fun createRemoteView(totalProgress: Int, smallTicks: Int, bigTicks: Int): RemoteViews {
         bitmap.eraseColor(Color.TRANSPARENT)
         val remoteView = RemoteViews(appContext.packageName, R.layout.progress_meter_widget)
         val progressMeterDrawer = ProgressMeterDrawer(appContext).apply {
             this.progress = totalProgress % MAX_PROGRESS
             this.totalProgress = totalProgress
+            this.smallTickCount = smallTicks
+            this.bigTickCount = bigTicks
         }
         progressMeterDrawer.draw(Canvas(bitmap), bitmap.width, bitmap.height)
         remoteView.setImageViewBitmap(R.id.widget_container, bitmap)

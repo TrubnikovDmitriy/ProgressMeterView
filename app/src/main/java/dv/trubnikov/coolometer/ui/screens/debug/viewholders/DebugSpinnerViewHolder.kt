@@ -32,7 +32,7 @@ class DebugSpinnerViewHolder private constructor(
         item.debugButtonText.setText(type.text)
         item.debugSpinner.adapter = adapter
         adapter.notifyDataSetChanged()
-        item.debugSpinner.setSelection(0, false)
+        item.debugSpinner.setSelection(type.initValue, false)
         item.debugSpinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(a: AdapterView<*>?, b: View?, position: Int, c: Long) {
                 type.listener.onItemClick(position)

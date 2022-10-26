@@ -11,11 +11,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import dv.trubnikov.coolometer.R
+import dv.trubnikov.coolometer.domain.resositories.PreferenceRepository
 import dv.trubnikov.coolometer.tools.unsafeLazy
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class DebugBottomSheet : BottomSheetDialogFragment() {
+
+    @Inject lateinit var preferences: PreferenceRepository
 
     private val viewModel: MainViewModel by unsafeLazy {
         requireActivity().viewModels<MainViewModel>().value
@@ -63,24 +69,28 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
         }
         val enableButtons = DebugItem.Switch(
             R.string.debug_panel_enable_buttons,
-            viewModel.debugButtonEnable,
+            preferences.enableDebugButtons,
         ) { isChecked ->
             viewModel.debugToggleCoolButtons(isChecked)
         }
-        val bigTickArray = context.resources.getIntArray(R.array.debug_panel_big_ticks_spinner)
+        val bigTickArrayMap = context.resources.getIntArray(R.array.debug_panel_big_ticks_spinner_map)
+        val bigInitIndex = bigTickArrayMap.indexOf(preferences.bigTicks)
         val bigTicksCount = DebugItem.Spinner(
             R.string.debug_panel_big_ticks_count,
-            R.array.debug_panel_big_ticks_spinner
+            R.array.debug_panel_big_ticks_spinner,
+            bigInitIndex,
         ) { index ->
-            val ticks = bigTickArray[index]
+            val ticks = bigTickArrayMap[index]
             viewModel.debugSetBigTicks(ticks)
         }
-        val smallTickArray = context.resources.getIntArray(R.array.debug_panel_small_ticks_spinner)
+        val smallTickArrayMap = context.resources.getIntArray(R.array.debug_panel_small_ticks_spinner_map)
+        val smallInitIndex = smallTickArrayMap.indexOf(preferences.smallTicks)
         val smallTicksCount = DebugItem.Spinner(
             R.string.debug_panel_small_ticks_count,
-            R.array.debug_panel_small_ticks_spinner
+            R.array.debug_panel_small_ticks_spinner,
+            smallInitIndex,
         ) { index ->
-            val ticks = smallTickArray[index]
+            val ticks = smallTickArrayMap[index]
             viewModel.debugSetSmallTicks(ticks)
         }
         val copyToken = DebugItem.Button(R.string.debug_panel_copy_token, R.drawable.ic_copy) {

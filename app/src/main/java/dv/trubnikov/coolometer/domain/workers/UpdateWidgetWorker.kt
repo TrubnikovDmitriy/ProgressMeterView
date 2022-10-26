@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
+import dv.trubnikov.coolometer.domain.resositories.PreferenceRepository
 import dv.trubnikov.coolometer.tools.getOrThrow
 import dv.trubnikov.coolometer.ui.widget.WidgetUpdater
 import timber.log.Timber
@@ -15,6 +16,7 @@ import timber.log.Timber
 class UpdateWidgetWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
+    private val preferenceRepository: PreferenceRepository,
     private val messageRepository: MessageRepository,
     private val widgetUpdater: WidgetUpdater,
 ) : CoroutineWorker(appContext, params) {
@@ -23,7 +25,9 @@ class UpdateWidgetWorker @AssistedInject constructor(
         try {
             Timber.d("UpdateWidgetWorker - start")
             val totalScore = messageRepository.getTotalScore().getOrThrow()
-            widgetUpdater.updateAllWidgets(totalScore)
+            val smallTicks = preferenceRepository.smallTicks
+            val bigTicks = preferenceRepository.bigTicks
+            widgetUpdater.updateAllWidgets(totalScore, smallTicks, bigTicks)
             Timber.d("UpdateWidgetWorker - finish")
             return Result.success()
         } catch (e: Exception) {

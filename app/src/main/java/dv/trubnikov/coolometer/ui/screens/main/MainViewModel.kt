@@ -19,6 +19,7 @@ import dv.trubnikov.coolometer.domain.parsers.MessageParser
 import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
 import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.serialize
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
+import dv.trubnikov.coolometer.domain.resositories.PreferenceRepository
 import dv.trubnikov.coolometer.domain.workers.UpdateWidgetWorker
 import dv.trubnikov.coolometer.tools.*
 import dv.trubnikov.coolometer.ui.notifications.Channel
@@ -29,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.Duration
 import javax.inject.Inject
@@ -36,15 +38,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    private val preferenceRepository: PreferenceRepository,
     private val messageRepository: MessageRepository,
     private val tokenProvider: CloudTokenProvider,
     private val widgetUpdater: WidgetUpdater,
     private val workManager: WorkManager,
     private val parser: MessageParser,
 ) : ViewModel() {
-
-    var debugButtonEnable: Boolean = false
-        private set
 
     val stateFlow = MutableStateFlow<State>(State.Loading)
     val actionFlow = OneshotValueFlow<Action>()
@@ -69,8 +69,7 @@ class MainViewModel @Inject constructor(
         }
         viewModelScope.launch(errorHandler) {
             messageRepository.markAsReceived(message.messageId)
-            val totalScore = messageRepository.getTotalScore().getOrThrow()
-            widgetUpdater.updateAllWidgets(totalScore)
+            updateWidgets()
         }
     }
 
@@ -99,6 +98,8 @@ class MainViewModel @Inject constructor(
                     return@launch
                 }
                 onMessageFromNotification(message)
+            } else {
+                Timber.i("В интенте нет бандла intent=[$intent]")
             }
         }
     }
@@ -114,21 +115,24 @@ class MainViewModel @Inject constructor(
 
     fun debugSetBigTicks(ticks: Int) {
         viewModelScope.launch {
+            preferenceRepository.bigTicks = ticks
+            updateSuccessState { copy(bigTicks = ticks) }
+            updateWidgets()
         }
     }
 
     fun debugSetSmallTicks(ticks: Int) {
         viewModelScope.launch {
+            preferenceRepository.smallTicks = ticks
+            updateSuccessState { copy(smallTicks = ticks) }
+            updateWidgets()
         }
     }
 
     fun debugToggleCoolButtons(isEnabled: Boolean) {
         viewModelScope.launch {
-            debugButtonEnable = isEnabled
-            val success = stateFlow.value as? State.Success
-            if (success != null) {
-                stateFlow.value = success.copy(debugButtonEnable = isEnabled)
-            }
+            preferenceRepository.enableDebugButtons = isEnabled
+            updateSuccessState { copy(debugButtonEnable = isEnabled) }
         }
     }
 
@@ -162,25 +166,32 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun createSuccessState(messages: List<Message>): State.Success {
-        val bigTicks = 5
-        val smallTicks = 2
         val totalProgress = messageRepository.getTotalScore().getOrThrow()
         val progress = totalProgress % MAX_PROGRESS
         return State.Success(
-            bigTicks = bigTicks,
-            smallTicks = smallTicks,
+            bigTicks = preferenceRepository.bigTicks,
+            smallTicks = preferenceRepository.smallTicks,
             progress = progress,
             totalProgress = totalProgress,
             unreceivedMessages = messages,
-            debugButtonEnable = debugButtonEnable,
+            debugButtonEnable = preferenceRepository.enableDebugButtons,
         )
+    }
+
+    private suspend fun updateWidgets() {
+        withContext(Dispatchers.IO) {
+            val totalScore = messageRepository.getTotalScore().getOrThrow()
+            val smallTicks = preferenceRepository.smallTicks
+            val bigTicks = preferenceRepository.bigTicks
+            widgetUpdater.updateAllWidgets(totalScore, smallTicks, bigTicks)
+        }
     }
 
     private fun createFakeNotification(context: Context) {
         val intent = parser.serialize<Intent>(FakeMessage()).getOr { return }
         intent.setClass(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
-            context, 0, intent, PendingIntent.FLAG_IMMUTABLE
+            context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
 
         val notification = NotificationCompat.Builder(context, Channel.DEBUG.id)
@@ -206,6 +217,13 @@ class MainViewModel @Inject constructor(
                 ExistingPeriodicWorkPolicy.KEEP,
                 widgetUpdater
             )
+        }
+    }
+
+    private fun updateSuccessState(transform: State.Success.() -> State.Success) {
+        val success = stateFlow.value as? State.Success
+        if (success != null) {
+            stateFlow.value = transform(success)
         }
     }
 

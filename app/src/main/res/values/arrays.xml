@@ -8,11 +8,25 @@
         <item>5 тиков</item>
         <item>6 тиков</item>
     </string-array>
+    <integer-array name="debug_panel_small_ticks_spinner_map">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </integer-array>
+
     <string-array name="debug_panel_big_ticks_spinner">
-        <item>2 тика</item>
         <item>3 тика</item>
         <item>4 тика</item>
         <item>5 тиков</item>
         <item>6 тиков</item>
     </string-array>
+    <integer-array name="debug_panel_big_ticks_spinner_map">
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </integer-array>
 </resources>
