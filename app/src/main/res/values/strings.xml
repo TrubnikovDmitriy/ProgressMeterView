@@ -20,6 +20,8 @@
         <item quantity="other">%1$s&#160;points</item>
     </plurals>
 
+    <string name="debug_notification_channel_name">Debug channel</string>
+    <string name="debug_notification_channel_description">Channel for notification from debug panel</string>
     <string name="debug_cool_button_text">Cheat up!</string>
     <string name="debug_cool_button_hint">Cheat points</string>
     <string name="debug_panel_title">Debug panel</string>

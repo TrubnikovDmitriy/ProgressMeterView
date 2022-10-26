@@ -1,6 +1,7 @@
 package dv.trubnikov.coolometer.ui.parsers
 
 import android.content.Intent
+import android.net.ParseException
 import android.os.Bundle
 import dv.trubnikov.coolometer.domain.models.FirebaseMessage
 import dv.trubnikov.coolometer.domain.models.Message
@@ -11,6 +12,7 @@ import dv.trubnikov.coolometer.domain.parsers.TypedMessageParser.Companion.TEXT_
 import dv.trubnikov.coolometer.tools.Out
 import dv.trubnikov.coolometer.tools.failure
 import dv.trubnikov.coolometer.tools.getOr
+import dv.trubnikov.coolometer.tools.toSignString
 
 object IntentMessageParser : TypedMessageParser<Intent> {
 
@@ -21,8 +23,7 @@ object IntentMessageParser : TypedMessageParser<Intent> {
 
         val id = extras.getOrLogError(ID_KEY).getOr { return it }
         val title = extras.getOrLogError(TEXT_KEY).getOr { return it }
-        val scoreString = extras.getOrLogError(SCORE_KEY).getOr { return it }
-        val score = parseScoreOrLogError(scoreString).getOr { return it }
+        val score = extras.parseScore().getOr { return it }
 
         val message = FirebaseMessage(
             messageId = id,
@@ -34,15 +35,12 @@ object IntentMessageParser : TypedMessageParser<Intent> {
     }
 
     override fun serialize(message: Message): Out<Intent> {
-        return failure { "This method is not implemented" }
-    }
-
-    private fun parseScoreOrLogError(score: String): Out<Int> {
-        return try {
-            Out.Success(score.toInt())
-        } catch (e: NumberFormatException) {
-            return Out.Failure(e, "Score не является числом score=[$score].")
+        val intent = Intent().apply {
+            putExtra(ID_KEY, message.messageId)
+            putExtra(TEXT_KEY, message.text)
+            putExtra(SCORE_KEY, message.score.toSignString())
         }
+        return Out.Success(intent)
     }
 
     private fun Bundle.getOrLogError(key: String): Out<String> {
@@ -50,7 +48,29 @@ object IntentMessageParser : TypedMessageParser<Intent> {
         if (value != null) {
             return Out.Success(value)
         } else {
-            return failure { "Отсутствует ключ [$key]. Не удалось распарсить сообщение [$this]." }
+            return Out.Failure(
+                ParseException("Отсутствует ключ [$key]. Не удалось распарсить сообщение [$this].")
+            )
+        }
+    }
+
+    private fun Bundle.parseScore(): Out<Int> {
+        if (!containsKey(SCORE_KEY)) {
+            val exception = ParseException(
+                "Отсутствует ключ [$SCORE_KEY]. Не удалось распарсить сообщение [$this]."
+            )
+            return Out.Failure(exception)
+        }
+        val score = getOrLogError(SCORE_KEY)
+        return if (score is Out.Success) {
+            try {
+                Out.Success(score.value.toInt())
+            } catch (e: NumberFormatException) {
+                Out.Failure(e, "Score не является числом score=[${score.value}].")
+            }
+        } else {
+            val scoreInt = getInt(SCORE_KEY)
+            Out.Success(scoreInt)
         }
     }
 }

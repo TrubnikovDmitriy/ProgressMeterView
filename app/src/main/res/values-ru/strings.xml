@@ -22,6 +22,8 @@
         <item quantity="other">%1$s&#160;баллов</item>
     </plurals>
 
+    <string name="debug_notification_channel_name">Дебажный канал</string>
+    <string name="debug_notification_channel_description">Канал для отображения нотификаций из дебаг панели</string>
     <string name="debug_cool_button_text">Накрутить!</string>
     <string name="debug_cool_button_hint">Накрутка баллов</string>
     <string name="debug_panel_title">Дебаг панель</string>

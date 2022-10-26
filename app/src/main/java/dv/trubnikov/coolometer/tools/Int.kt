@@ -1,5 +1,5 @@
 package dv.trubnikov.coolometer.tools
 
-fun Int.toStringWithSign(): String {
+fun Int.toSignString(): String {
     return if (this > 0) "+$this" else "$this"
 }

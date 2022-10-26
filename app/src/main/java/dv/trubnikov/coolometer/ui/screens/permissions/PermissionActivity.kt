@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.databinding.ActivityPermissionBinding
 import dv.trubnikov.coolometer.tools.unsafeLazy
+import dv.trubnikov.coolometer.ui.notifications.Channel
 import dv.trubnikov.coolometer.ui.screens.main.MainActivity
 
 
@@ -126,6 +127,9 @@ class PermissionActivity : AppCompatActivity() {
     }
 
     private fun openMainActivity() {
+        for (channel in Channel.values()) {
+            channel.init(this)
+        }
         val intent = MainActivity.intentForActivity(this)
         startActivity(intent)
         finish()

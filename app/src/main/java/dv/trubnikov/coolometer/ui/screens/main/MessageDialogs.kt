@@ -7,7 +7,7 @@ import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.domain.models.Message
-import dv.trubnikov.coolometer.tools.toStringWithSign
+import dv.trubnikov.coolometer.tools.toSignString
 import kotlin.math.absoluteValue
 
 fun Activity.showNewMessageDialog(message: Message, onAccept: (Message) -> Unit) {
@@ -60,7 +60,7 @@ fun Activity.showChoiceDialog(messages: List<Message>, onClickItem: (Message) ->
 
 private fun Activity.buildTitle(@StringRes textId: Int, score: Int): SpannableStringBuilder {
     val absScore = score.absoluteValue
-    val textScore = score.toStringWithSign()
+    val textScore = score.toSignString()
     val titleScore = resources.getQuantityString(R.plurals.alert_dialog_received_score, absScore, textScore)
     return SpannableStringBuilder()
         .append(getString(textId))

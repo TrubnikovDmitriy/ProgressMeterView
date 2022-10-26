@@ -54,7 +54,8 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             dismiss()
         }
         val sendNotification = DebugItem.Button(R.string.debug_panel_fake_notification, R.drawable.ic_notification) {
-            viewModel.debugSendFakeNotification()
+            viewModel.debugSendFakeNotification(context)
+            dismiss()
         }
         val dropConfetti = DebugItem.Button(R.string.debug_panel_confetti, R.drawable.ic_firework) {
             viewModel.debugDropConfetti()

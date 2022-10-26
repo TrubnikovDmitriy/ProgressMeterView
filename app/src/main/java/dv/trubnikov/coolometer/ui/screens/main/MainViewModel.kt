@@ -1,8 +1,10 @@
 package dv.trubnikov.coolometer.ui.screens.main
 
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -15,9 +17,11 @@ import dv.trubnikov.coolometer.domain.models.FakeMessage
 import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.domain.parsers.MessageParser
 import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
+import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.serialize
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.domain.workers.UpdateWidgetWorker
 import dv.trubnikov.coolometer.tools.*
+import dv.trubnikov.coolometer.ui.notifications.Channel
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
 import dv.trubnikov.coolometer.ui.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -28,6 +32,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.Duration
 import javax.inject.Inject
+
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -87,8 +92,7 @@ class MainViewModel @Inject constructor(
 
     fun onMessageFromNotification(intent: Intent?) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (intent?.hasExtra(CMS_MARKER_KEY) == true) {
-                intent.removeExtra(CMS_MARKER_KEY)
+            if (intent?.extras != null) {
                 val message = parser.parse(intent).getOr { failure ->
                     Timber.e("Не удалось распарсить входной интент")
                     failure.logError()
@@ -102,7 +106,7 @@ class MainViewModel @Inject constructor(
     fun debugCopyToken(context: Context) {
         viewModelScope.launch {
             val token = tokenProvider.getToken()
-            val label = context.getString(R.string.debug_panel_copy_token_label)
+            val label = context.getString(dv.trubnikov.coolometer.R.string.debug_panel_copy_token_label)
             val clip = ClipData.newPlainText(label, token)
             context.getClipboardManager().setPrimaryClip(clip)
         }
@@ -128,8 +132,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun debugSendFakeNotification() {
+    fun debugSendFakeNotification(context: Context) {
         viewModelScope.launch {
+            createFakeNotification(context)
         }
     }
 
@@ -171,6 +176,26 @@ class MainViewModel @Inject constructor(
         )
     }
 
+    private fun createFakeNotification(context: Context) {
+        val intent = parser.serialize<Intent>(FakeMessage()).getOr { return }
+        intent.setClass(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            context, 0, intent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, Channel.DEBUG.id)
+            .setSmallIcon(R.drawable.ic_progress)
+            .setContentTitle("Fake notification")
+            .setContentText("Notification from debug panel")
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+
+        Channel.DEBUG.init(context)
+        val manager = context.getNotificationManager()
+        manager.notify(0, notification)
+    }
+
     private fun scheduleWidgetUpdater() {
         viewModelScope.launch {
             val widgetUpdater = PeriodicWorkRequestBuilder<UpdateWidgetWorker>(
@@ -208,7 +233,6 @@ class MainViewModel @Inject constructor(
     }
 
     companion object {
-        private const val CMS_MARKER_KEY = "google.ttl"
         private const val WIDGET_UPDATER_WORK = "UpdateWidgetWorker_Periodic"
     }
 }

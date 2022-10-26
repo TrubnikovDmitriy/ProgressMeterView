@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.onMessageFromNotification(intent)
+        intent = null
     }
 
     override fun onNewIntent(intent: Intent?) {
