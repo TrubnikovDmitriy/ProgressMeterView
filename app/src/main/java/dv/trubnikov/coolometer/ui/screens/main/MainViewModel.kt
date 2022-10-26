@@ -197,8 +197,9 @@ class MainViewModel @Inject constructor(
         val notification = NotificationCompat.Builder(context, Channel.DEBUG.id)
             .setSmallIcon(R.drawable.ic_progress)
             .setContentTitle("Fake notification")
-            .setContentText("Notification from debug panel")
+            .setContentText("Notification from the debug panel")
             .setContentIntent(pendingIntent)
+            .setColor(context.getColor(R.color.secondaryDarkColor))
             .setAutoCancel(true)
             .build()
 
