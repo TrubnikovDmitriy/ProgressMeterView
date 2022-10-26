@@ -16,7 +16,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.github.jinatonic.confetti.CommonConfetti
 import dagger.hilt.android.AndroidEntryPoint
-import dv.trubnikov.coolometer.BuildConfig
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.databinding.ActivityMainBinding
 import dv.trubnikov.coolometer.domain.models.Message
@@ -82,11 +81,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMessage(message: Message) {
-        with(viewBinding) {
-            val isReceived = progressMeter.addProgress(message.score, true)
-            if (isReceived) {
-                viewModel.markAsReceived(message)
-            }
+        val isReceived = viewBinding.progressMeter.addProgress(message.score, true)
+        if (isReceived) {
+            viewModel.markAsReceived(this, message)
         }
     }
 

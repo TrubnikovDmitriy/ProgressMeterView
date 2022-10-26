@@ -2,6 +2,7 @@ package dv.trubnikov.coolometer.ui.screens.main
 
 import android.app.PendingIntent
 import android.content.ClipData
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
@@ -24,13 +25,11 @@ import dv.trubnikov.coolometer.domain.workers.UpdateWidgetWorker
 import dv.trubnikov.coolometer.tools.*
 import dv.trubnikov.coolometer.ui.notifications.Channel
 import dv.trubnikov.coolometer.ui.views.ProgressMeterDrawer.Companion.MAX_PROGRESS
+import dv.trubnikov.coolometer.ui.widget.ProgressMeterWidget
 import dv.trubnikov.coolometer.ui.widget.WidgetUpdater
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.Duration
 import javax.inject.Inject
@@ -62,13 +61,14 @@ class MainViewModel @Inject constructor(
         scheduleWidgetUpdater()
     }
 
-    fun markAsReceived(message: Message) {
+    fun markAsReceived(context: Context, message: Message) {
         val errorHandler = CoroutineExceptionHandler { _, error ->
             Timber.e(error, "Не удалось пометить достижение полученным")
             stateFlow.value = State.Error
         }
         viewModelScope.launch(errorHandler) {
             messageRepository.markAsReceived(message.messageId)
+            offerToAddWidgetToHomeScreen(context)
             updateWidgets()
         }
     }
@@ -208,6 +208,19 @@ class MainViewModel @Inject constructor(
         manager.notify(0, notification)
     }
 
+    private fun offerToAddWidgetToHomeScreen(context: Context) {
+        if (!preferenceRepository.isWidgetOffered) {
+            Timber.i("Offer to add widget to home screen")
+            viewModelScope.launch {
+                delay(WIDGET_OFFER_DELAY_MS)
+                preferenceRepository.isWidgetOffered = true
+                val widgetManager = context.getAppWidgetManager()
+                val widgetComponent = ComponentName(context, ProgressMeterWidget::class.java)
+                widgetManager.requestPinAppWidget(widgetComponent, null, null)
+            }
+        }
+    }
+
     private fun scheduleWidgetUpdater() {
         viewModelScope.launch {
             val widgetUpdater = PeriodicWorkRequestBuilder<UpdateWidgetWorker>(
@@ -253,5 +266,6 @@ class MainViewModel @Inject constructor(
 
     companion object {
         private const val WIDGET_UPDATER_WORK = "UpdateWidgetWorker_Periodic"
+        private const val WIDGET_OFFER_DELAY_MS = 1_000L
     }
 }

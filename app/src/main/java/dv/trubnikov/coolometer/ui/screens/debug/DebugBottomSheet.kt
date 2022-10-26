@@ -93,6 +93,12 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             val ticks = smallTickArrayMap[index]
             viewModel.debugSetSmallTicks(ticks)
         }
+        val isWidgetOffered = DebugItem.Switch(
+            R.string.debug_panel_widget_offer,
+            preferences.isWidgetOffered,
+        ) { isChecked ->
+            preferences.isWidgetOffered = isChecked
+        }
         val copyToken = DebugItem.Button(R.string.debug_panel_copy_token, R.drawable.ic_copy) {
             viewModel.debugCopyToken(context)
         }
@@ -103,6 +109,7 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             enableButtons,
             bigTicksCount,
             smallTicksCount,
+            isWidgetOffered,
             copyToken,
         )
         debugRecycler.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)

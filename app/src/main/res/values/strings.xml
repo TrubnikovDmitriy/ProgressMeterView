@@ -28,6 +28,7 @@
     <string name="debug_panel_fake_message">Add fake message</string>
     <string name="debug_panel_confetti">Drop confetti</string>
     <string name="debug_panel_enable_buttons">Enable debug buttons</string>
+    <string name="debug_panel_widget_offer">Was it suggested to install the widget on the home screen</string>
     <string name="debug_panel_big_ticks_count">Big ticks count</string>
     <string name="debug_panel_small_ticks_count">Small ticks count</string>
     <string name="debug_panel_copy_token">Copy the token</string>
