@@ -1,7 +1,6 @@
 package dv.trubnikov.coolometer.data.room.repositories
 
 import android.database.sqlite.SQLiteException
-import androidx.annotation.WorkerThread
 import dv.trubnikov.coolometer.data.room.dao.MessageDao
 import dv.trubnikov.coolometer.data.room.tables.MessageEntity
 import dv.trubnikov.coolometer.domain.models.Message
@@ -25,17 +24,6 @@ class RoomMessageRepository @Inject constructor(
     private val messageDao: MessageDao,
     private val parser: MessageParser,
 ) : MessageRepository {
-
-    @WorkerThread
-    override fun insertMessageBlocking(message: Message): Out<Unit> {
-        return try {
-            val entity = parser.serialize<MessageEntity>(message).getOr { return it }
-            messageDao.insertMessageBlocking(entity)
-            Out.Success(Unit)
-        } catch (e: SQLiteException) {
-            Out.Failure(e)
-        }
-    }
 
     override suspend fun insertMessage(message: Message): Out<Unit> {
         val entity = parser.serialize<MessageEntity>(message).getOr { return it }
