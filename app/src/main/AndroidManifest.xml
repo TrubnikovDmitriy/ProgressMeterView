@@ -16,7 +16,9 @@
         <activity
             android:name=".ui.screens.main.MainActivity"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,8 +28,7 @@
 
         <activity
             android:name=".ui.screens.permissions.PermissionActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
 
         <service
             android:name=".data.cloud.CloudMessagingService"

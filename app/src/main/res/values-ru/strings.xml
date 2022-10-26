@@ -4,14 +4,13 @@
     <string name="app_widget_description">Веди учёт своей крутости</string>
 
     <string name="generic_accept">Принять</string>
+    <string name="generic_choose">Выбрать</string>
     <string name="generic_close">Закрыть</string>
     <string name="generic_okay">Окау</string>
 
     <string name="main_single_achievement">У тебя новое достижение</string>
     <string name="main_many_achievements">У тебя новые достижения</string>
 
-    <string name="alert_dialog_new_message">У тебя новое достижение!</string>
-    <string name="alert_dialog_accept_message">Доступное достижение</string>
     <string name="alert_dialog_already_received_title">Стопэ</string>
     <string name="alert_dialog_already_received_text">Ты уже получала баллы за это достижение</string>
     <string name="alert_dialog_choice_title">Доступные достижения, которые ещё не получены:</string>

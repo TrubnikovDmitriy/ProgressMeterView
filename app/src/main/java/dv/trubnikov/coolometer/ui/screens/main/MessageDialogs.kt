@@ -2,8 +2,6 @@ package dv.trubnikov.coolometer.ui.screens.main
 
 import android.app.Activity
 import android.content.Context
-import android.text.SpannableStringBuilder
-import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.domain.models.Message
@@ -11,9 +9,8 @@ import dv.trubnikov.coolometer.tools.toSignString
 import kotlin.math.absoluteValue
 
 fun Activity.showNewMessageDialog(message: Message, onAccept: (Message) -> Unit) {
-    val title = buildTitle(R.string.alert_dialog_new_message, message.score)
     AlertDialogBuilder(this)
-        .setTitle(title)
+        .setTitle(buildTitle(message.score))
         .setMessage(message.text)
         .setPositiveButton(R.string.generic_accept) { _, _ -> onAccept(message) }
         .setOnDismissListener { onAccept(message) }
@@ -21,9 +18,8 @@ fun Activity.showNewMessageDialog(message: Message, onAccept: (Message) -> Unit)
 }
 
 fun Activity.showAcceptMessage(message: Message, onAccept: (Message) -> Unit) {
-    val title = buildTitle(R.string.alert_dialog_accept_message, message.score)
     AlertDialogBuilder(this)
-        .setTitle(title)
+        .setTitle(buildTitle(message.score))
         .setMessage(message.text)
         .setPositiveButton(R.string.generic_accept) { _, _ -> onAccept(message) }
         .setOnDismissListener { onAccept(message) }
@@ -53,18 +49,15 @@ fun Activity.showChoiceDialog(messages: List<Message>, onClickItem: (Message) ->
     AlertDialogBuilder(this)
         .setSingleChoiceItems(items, checkedIndex) { _, index -> checkedIndex = index }
         .setTitle(R.string.alert_dialog_choice_title)
-        .setPositiveButton(R.string.generic_accept) { _, _ -> onClickItem(messages[checkedIndex]) }
+        .setPositiveButton(R.string.generic_choose) { _, _ -> onClickItem(messages[checkedIndex]) }
         .setNegativeButton(R.string.generic_close, null)
         .show()
 }
 
-private fun Activity.buildTitle(@StringRes textId: Int, score: Int): SpannableStringBuilder {
+private fun Activity.buildTitle(score: Int): String {
     val absScore = score.absoluteValue
     val textScore = score.toSignString()
-    val titleScore = resources.getQuantityString(R.plurals.alert_dialog_received_score, absScore, textScore)
-    return SpannableStringBuilder()
-        .append(getString(textId))
-        .append(" ($titleScore)")
+    return resources.getQuantityString(R.plurals.alert_dialog_received_score, absScore, textScore)
 }
 
 @Suppress("FunctionName")
