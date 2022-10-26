@@ -32,11 +32,9 @@ interface DataModule {
         @Provides
         @Singleton
         fun provideDatabase(@ApplicationContext appContext: Context): AppDatabase {
-            return Room.databaseBuilder(
-                appContext,
-                AppDatabase::class.java,
-                "app-database"
-            ).build()
+            return Room.databaseBuilder(appContext, AppDatabase::class.java, "app-database")
+                .createFromAsset("database_v1.db")
+                .build()
         }
 
         @Provides
