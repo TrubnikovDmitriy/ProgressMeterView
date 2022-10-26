@@ -5,4 +5,5 @@ interface PreferenceRepository {
     var smallTicks: Int
     var isWidgetOffered: Boolean
     var enableDebugButtons: Boolean
+    var isPermissionRequested: Boolean
 }

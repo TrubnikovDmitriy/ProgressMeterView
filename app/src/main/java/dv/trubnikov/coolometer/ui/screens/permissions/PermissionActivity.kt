@@ -11,14 +11,20 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.databinding.ActivityPermissionBinding
+import dv.trubnikov.coolometer.domain.resositories.PreferenceRepository
 import dv.trubnikov.coolometer.tools.unsafeLazy
 import dv.trubnikov.coolometer.ui.notifications.Channel
 import dv.trubnikov.coolometer.ui.screens.main.MainActivity
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class PermissionActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var preferences: PreferenceRepository
 
     private val viewBinding by unsafeLazy { ActivityPermissionBinding.inflate(layoutInflater) }
 
@@ -44,11 +50,13 @@ class PermissionActivity : AppCompatActivity() {
             if ((grantResults.getOrNull(0) == PERMISSION_GRANTED)) {
                 openMainActivity()
             } else {
-                @SuppressLint("InlinedApi")
-                val isTheFirstRequest = shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
-                if (isTheFirstRequest) {
+                val isRequestedBefore = preferences.isPermissionRequested
+                @SuppressLint("InlinedApi") val isDeniedByUser =
+                    shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+                preferences.isPermissionRequested = true
+                if (isDeniedByUser) {
                     showAngryRationText()
-                } else {
+                } else if (isRequestedBefore) {
                     showVeryAngryRationText()
                 }
             }
@@ -56,12 +64,18 @@ class PermissionActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
+        val isRequestedBefore = preferences.isPermissionRequested
+        @SuppressLint("InlinedApi") val isDeniedByUser =
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
         when {
             checkNotificationPermission(this) -> {
                 openMainActivity()
             }
-            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+            isDeniedByUser -> {
                 showAngryRationText()
+            }
+            isRequestedBefore -> {
+                showVeryAngryRationText()
             }
             else -> {
                 showRationText()

@@ -21,24 +21,27 @@ class SharedPreferenceRepository @Inject constructor(
         set(value) = preferences.edit { putInt(SMALL_TICKS_KEY, value) }
 
     override var isWidgetOffered: Boolean
-        get() = preferences.getBoolean(IS_WIDGET_OFFERED_KEY, DEFAULT_IS_WIDGET_OFFERED)
+        get() = preferences.getBoolean(IS_WIDGET_OFFERED_KEY, false)
         set(value) = preferences.edit { putBoolean(IS_WIDGET_OFFERED_KEY, value) }
 
     override var enableDebugButtons: Boolean
-        get() = preferences.getBoolean(ENABLED_DEBUG_BUTTON_KEY, DEFAULT_ENABLED_DEBUG_BUTTON)
+        get() = preferences.getBoolean(ENABLED_DEBUG_BUTTON_KEY, false)
         set(value) = preferences.edit { putBoolean(ENABLED_DEBUG_BUTTON_KEY, value) }
+
+    override var isPermissionRequested: Boolean
+        get() = preferences.getBoolean(IS_PERMISSION_REQUESTED_KEY, false)
+        set(value) = preferences.edit { putBoolean(IS_PERMISSION_REQUESTED_KEY, value) }
 
     companion object {
         private const val PREFS_NAME = "dv.trubnikov.coolometer.data.preferences.SharedPreferences"
 
         private const val DEFAULT_BIG_TICKS = 5
         private const val DEFAULT_SMALL_TICKS = 2
-        private const val DEFAULT_IS_WIDGET_OFFERED = false
-        private const val DEFAULT_ENABLED_DEBUG_BUTTON = false
 
         private const val BIG_TICKS_KEY = "BIG_TICKS_KEY"
         private const val SMALL_TICKS_KEY = "SMALL_TICKS_KEY"
         private const val IS_WIDGET_OFFERED_KEY = "IS_WIDGET_OFFERED_KEY"
         private const val ENABLED_DEBUG_BUTTON_KEY = "ENABLED_DEBUG_BUTTON_KEY"
+        private const val IS_PERMISSION_REQUESTED_KEY = "IS_PERMISSION_REQUESTED_KEY"
     }
 }
