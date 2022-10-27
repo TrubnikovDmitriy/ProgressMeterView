@@ -149,7 +149,11 @@ class MainActivity : AppCompatActivity() {
                 progressMeter.isVisible = true
                 debugCoolEdit.isVisible = state.debugButtonEnable
                 debugCoolButton.isVisible = state.debugButtonEnable
-                fab.isVisible = state.unreceivedMessages.isNotEmpty()
+                if (state.unreceivedMessages.isNotEmpty()) {
+                    fab.visibility = View.VISIBLE
+                } else {
+                    fab.visibility = View.INVISIBLE
+                }
                 fab.setIconResource(state.getIconForFab())
                 fab.setText(state.getTextForFab())
                 historyFab.isVisible = true

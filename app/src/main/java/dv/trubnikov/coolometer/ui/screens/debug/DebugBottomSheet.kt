@@ -97,6 +97,10 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             viewModel.debugDeleteReceivedMessages()
             dismiss()
         }
+        val deleteFakes = DebugItem.Button(R.string.debug_panel_delete_fakes, R.drawable.ic_fake) {
+            viewModel.debugDeleteFakeMessages()
+            dismiss()
+        }
         val isWidgetOffered = DebugItem.Switch(
             R.string.debug_panel_widget_offer,
             preferences.isWidgetOffered,
@@ -115,6 +119,7 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             smallTicksCount,
             isWidgetOffered,
             truncation,
+            deleteFakes,
             copyToken,
         )
         debugRecycler.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)

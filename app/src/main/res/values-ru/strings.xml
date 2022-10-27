@@ -35,6 +35,7 @@
     <string name="debug_panel_big_ticks_count">Размер большой шкалы крутометра</string>
     <string name="debug_panel_small_ticks_count">Размер маленькой шкалы крутометра</string>
     <string name="debug_panel_truncate">Обнулись!</string>
+    <string name="debug_panel_delete_fakes">Удалить фейковые достижения из базы данных</string>
     <string name="debug_panel_copy_token">Скопировать токен</string>
     <string name="debug_panel_copy_token_label">Токен скопирован</string>
 

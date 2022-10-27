@@ -17,8 +17,12 @@ data class FirebaseMessage(
 ) : Message
 
 class FakeMessage(
-    override val messageId: String = UUID.randomUUID().toString(),
+    override val messageId: String = FAKE_ID_PREFIX + UUID.randomUUID().toString(),
     override val text: String = "Fake news!",
-    override val score: Int = +42,
+    override val score: Int = +10,
     override val timestamp: Long = System.currentTimeMillis(),
-) : Message
+) : Message {
+    companion object {
+        const val FAKE_ID_PREFIX = "fake_id_"
+    }
+}

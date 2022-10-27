@@ -186,6 +186,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun debugDeleteFakeMessages() {
+        viewModelScope.launch(debugErrorHandler) {
+            val receivedMessages = messageRepository.getReceivedMessages().first()
+            val fakeMessages = receivedMessages.filter {
+                it.messageId.startsWith(FakeMessage.FAKE_ID_PREFIX)
+            }
+            launch {
+                for (fake in fakeMessages) {
+                    messageRepository.deleteMessage(fake.messageId)
+                }
+            }
+        }
+    }
+
     private suspend fun onMessageFromNotification(message: Message) {
         messageRepository.insertMessage(message)
         val messages = messageRepository.getUnreceivedMessages().first()
