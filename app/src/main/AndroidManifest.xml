@@ -27,6 +27,10 @@
         </activity>
 
         <activity
+            android:name=".ui.screens.history.HistoryActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.screens.permissions.PermissionActivity"
             android:exported="false" />
 

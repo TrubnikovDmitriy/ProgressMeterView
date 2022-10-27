@@ -15,11 +15,17 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMessage(message: MessageEntity)
 
-    @Query("SELECT * FROM messages WHERE is_received=0")
+    @Query("SELECT * FROM messages WHERE is_received=1 ORDER BY time")
+    fun getReceivedMessages(): Flow<List<MessageEntity>>
+
+    @Query("SELECT * FROM messages WHERE is_received=0 ORDER BY time")
     fun getUnreceivedMessages(): Flow<List<MessageEntity>>
 
-    @Query("UPDATE messages SET is_received='1' WHERE id=(:messageId)")
-    suspend fun markAsReceived(messageId: String)
+    @Query("UPDATE messages SET is_received='1', time=(:timestamp)  WHERE id=(:messageId)")
+    suspend fun markAsReceived(messageId: String, timestamp: Long)
+
+    @Query("DELETE FROM messages WHERE id=(:messageId)")
+    suspend fun deleteMessage(messageId: String)
 
     @Query("SELECT IFNULL(SUM(score), 0) FROM messages WHERE is_received=1")
     suspend fun getTotalScore(): Int

@@ -8,6 +8,13 @@
         <item name="maxLines">2</item>
     </style>
 
+    <!-- History Table items -->
+    <style name="HistoryTabItem" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">4dp</item>
+    </style>
+
     <!-- Alert Dialogs -->
     <style name="Cool.MaterialAlertDialog.Title.Text" parent="MaterialAlertDialog.Material3.Title.Text">
         <item name="android:textStyle">bold</item>

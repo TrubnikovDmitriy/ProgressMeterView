@@ -13,6 +13,7 @@ object EntityMessageParser : TypedMessageParser<MessageEntity> {
             messageId = value.id,
             score = value.score,
             text = value.text,
+            timestamp = value.timestamp,
         )
         return Out.Success(message)
     }

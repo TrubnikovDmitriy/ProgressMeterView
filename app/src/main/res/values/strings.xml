@@ -7,6 +7,7 @@
     <string name="generic_choose">Choose</string>
     <string name="generic_close">Close</string>
     <string name="generic_okay">Okay</string>
+    <string name="general_error_text">The error has already been transmitted to the competent authorities</string>
 
     <string name="main_single_achievement">You received the new achievement</string>
     <string name="main_many_achievements">You received the new achievements</string>
@@ -31,6 +32,7 @@
     <string name="debug_panel_widget_offer">Was it suggested to install the widget on the home screen</string>
     <string name="debug_panel_big_ticks_count">Big ticks count</string>
     <string name="debug_panel_small_ticks_count">Small ticks count</string>
+    <string name="debug_panel_truncate">Truncate yourself!</string>
     <string name="debug_panel_copy_token">Copy the token</string>
     <string name="debug_panel_copy_token_label">Token has copied</string>
 
@@ -43,4 +45,9 @@
     <string name="permission_button_settings">Open settings</string>
     <string name="permission_button_grant">Grant</string>
     <string name="permission_button_deny">Nope</string>
+
+    <string name="history_table_header_score">Score:</string>
+    <string name="history_table_header_text">Description:</string>
+    <string name="history_table_header_date">Date:</string>
+    <string name="history_table_header_empty">There is no data yet.\n\nWait, are you going through the trash again?</string>
 </resources>

@@ -32,6 +32,15 @@ class RoomMessageRepository @Inject constructor(
         }
     }
 
+    override suspend fun getReceivedMessages(): Flow<List<Message>> {
+        return flow {
+            messageDao.getReceivedMessages().collect { messages ->
+                val models = messages.map { parser.parse(it).getOrThrow() }
+                emit(models)
+            }
+        }
+    }
+
     override suspend fun getUnreceivedMessages(): Flow<List<Message>> {
         return flow {
             messageDao.getUnreceivedMessages().collect { messages ->
@@ -43,7 +52,13 @@ class RoomMessageRepository @Inject constructor(
 
     override suspend fun markAsReceived(messageId: String): Out<Unit> {
         return safeDatabaseRequest(Dispatchers.IO) {
-            messageDao.markAsReceived(messageId)
+            messageDao.markAsReceived(messageId, System.currentTimeMillis())
+        }
+    }
+
+    override suspend fun deleteMessage(messageId: String): Out<Unit> {
+        return safeDatabaseRequest(Dispatchers.IO) {
+            messageDao.deleteMessage(messageId)
         }
     }
 

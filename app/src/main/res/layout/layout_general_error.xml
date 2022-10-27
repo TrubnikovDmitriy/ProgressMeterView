@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/h_guideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.40"
+        tools:viewBindingIgnore="true"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/error_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="@id/h_guideline"
+        app:layout_constraintTop_toTopOf="@id/h_guideline"
+        app:srcCompat="@drawable/image_error_robot"
+        />
+
+    <TextView
+        android:id="@+id/error_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/digital_cyrillic"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.5"
+        android:text="@string/general_error_text"
+        app:layout_constraintEnd_toEndOf="@id/error_image"
+        app:layout_constraintStart_toStartOf="@id/error_image"
+        app:layout_constraintTop_toBottomOf="@+id/error_image"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

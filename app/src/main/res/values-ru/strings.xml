@@ -7,6 +7,7 @@
     <string name="generic_choose">Выбрать</string>
     <string name="generic_close">Закрыть</string>
     <string name="generic_okay">Окау</string>
+    <string name="general_error_text">Ошибка уже передана в компентентные органы</string>
 
     <string name="main_single_achievement">У тебя новое достижение</string>
     <string name="main_many_achievements">У тебя новые достижения</string>
@@ -33,6 +34,7 @@
     <string name="debug_panel_widget_offer">Предлагалось ли уже добавить виджет на рабочий стол</string>
     <string name="debug_panel_big_ticks_count">Размер большой шкалы крутометра</string>
     <string name="debug_panel_small_ticks_count">Размер маленькой шкалы крутометра</string>
+    <string name="debug_panel_truncate">Обнулись!</string>
     <string name="debug_panel_copy_token">Скопировать токен</string>
     <string name="debug_panel_copy_token_label">Токен скопирован</string>
 
@@ -46,4 +48,8 @@
     <string name="permission_button_grant">Разрешить</string>
     <string name="permission_button_deny">Неть</string>
 
+    <string name="history_table_header_score">Баллы:</string>
+    <string name="history_table_header_text">Описание:</string>
+    <string name="history_table_header_date">Дата:</string>
+    <string name="history_table_header_empty">Здесь пока ещё нет данных о твоей крутости\n\n…\nПогоди, ты что снова копаешься в мусорке?</string>
 </resources>
