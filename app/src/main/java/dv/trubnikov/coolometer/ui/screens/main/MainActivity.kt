@@ -24,12 +24,14 @@ import dv.trubnikov.coolometer.tools.unsafeLazy
 import dv.trubnikov.coolometer.ui.screens.debug.DebugBottomSheet
 import dv.trubnikov.coolometer.ui.screens.debug.SecretClickListener
 import dv.trubnikov.coolometer.ui.screens.debug.SecretClickListener.Tap
+import dv.trubnikov.coolometer.ui.screens.history.HistoryActivity
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.Action
 import dv.trubnikov.coolometer.ui.screens.main.MainViewModel.State
 import dv.trubnikov.coolometer.ui.screens.permissions.PermissionActivity
 import dv.trubnikov.coolometer.ui.screens.permissions.PermissionActivity.Companion.checkNotificationPermission
 import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -59,12 +61,16 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners() {
-        with(viewBinding) {
+        with(viewBinding.layoutContent) {
             progressMeter.overshootListener = OvershootListener { forward ->
                 if (forward) showConfetti()
             }
             fab.setOnClickListener {
                 viewModel.onFabClick()
+            }
+            historyFab.setOnClickListener { 
+                val intent = HistoryActivity.intentForActivity(this@MainActivity)
+                startActivity(intent)
             }
             debugCoolButton.setOnClickListener {
                 val score = debugCoolNumber.text.toString().toIntOrNull()
@@ -81,7 +87,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleMessage(message: Message) {
-        val isReceived = viewBinding.progressMeter.addProgress(message.score, true)
+        val progressMeter = viewBinding.layoutContent.progressMeter
+        val isReceived = progressMeter.addProgress(message.score, true)
         if (isReceived) {
             viewModel.markAsReceived(this, message)
         }
@@ -127,8 +134,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleState(state: State) {
+        viewBinding.layoutError.root.isVisible = state === State.Error
+        viewBinding.layoutContent.root.isVisible = state !== State.Error
         when (state) {
-            is State.Success -> with(viewBinding) {
+            is State.Success -> with(viewBinding.layoutContent) {
                 progressMeter.progress = state.progress
                 progressMeter.totalProgress = state.totalProgress
                 progressMeter.bigTickCount = state.bigTicks
@@ -139,12 +148,17 @@ class MainActivity : AppCompatActivity() {
                 fab.isVisible = state.unreceivedMessages.isNotEmpty()
                 fab.setIconResource(state.getIconForFab())
                 fab.setText(state.getTextForFab())
+                historyFab.isVisible = true
             }
-            is State.Error -> with(viewBinding) {
+            is State.Error -> with(viewBinding.layoutContent) {
+                debugCoolButton.isVisible = false
                 progressMeter.isVisible = false
+                debugCoolEdit.isVisible = false
+                historyFab.isVisible = false
+                fab.isVisible = false
             }
-            is State.Loading -> with(viewBinding) {
-                progressMeter.isVisible = false
+            is State.Loading -> {
+                Timber.e("На главном экране $state")
             }
         }
     }
