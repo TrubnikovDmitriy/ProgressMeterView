@@ -93,6 +93,10 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             val ticks = smallTickArrayMap[index]
             viewModel.debugSetSmallTicks(ticks)
         }
+        val truncation = DebugItem.Button(R.string.debug_panel_truncate, R.drawable.ic_putin) {
+            viewModel.debugDeleteReceivedMessages()
+            dismiss()
+        }
         val isWidgetOffered = DebugItem.Switch(
             R.string.debug_panel_widget_offer,
             preferences.isWidgetOffered,
@@ -110,6 +114,7 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             bigTicksCount,
             smallTicksCount,
             isWidgetOffered,
+            truncation,
             copyToken,
         )
         debugRecycler.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)

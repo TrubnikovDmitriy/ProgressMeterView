@@ -45,6 +45,11 @@ class MainViewModel @Inject constructor(
     private val parser: MessageParser,
 ) : ViewModel() {
 
+    private val debugErrorHandler = CoroutineExceptionHandler { _, error ->
+        Timber.e(error, "Ошибка при работе с дебаг панелью")
+        stateFlow.value = State.Error
+    }
+
     val stateFlow = MutableStateFlow<State>(State.Loading)
     val actionFlow = OneshotValueFlow<Action>()
 
@@ -105,16 +110,16 @@ class MainViewModel @Inject constructor(
     }
 
     fun debugCopyToken(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(debugErrorHandler) {
             val token = tokenProvider.getToken()
-            val label = context.getString(dv.trubnikov.coolometer.R.string.debug_panel_copy_token_label)
+            val label = context.getString(R.string.debug_panel_copy_token_label)
             val clip = ClipData.newPlainText(label, token)
             context.getClipboardManager().setPrimaryClip(clip)
         }
     }
 
     fun debugSetBigTicks(ticks: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(debugErrorHandler) {
             preferenceRepository.bigTicks = ticks
             updateSuccessState { copy(bigTicks = ticks) }
             updateWidgets()
@@ -122,7 +127,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun debugSetSmallTicks(ticks: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(debugErrorHandler) {
             preferenceRepository.smallTicks = ticks
             updateSuccessState { copy(smallTicks = ticks) }
             updateWidgets()
@@ -130,27 +135,38 @@ class MainViewModel @Inject constructor(
     }
 
     fun debugToggleCoolButtons(isEnabled: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(debugErrorHandler) {
             preferenceRepository.enableDebugButtons = isEnabled
             updateSuccessState { copy(debugButtonEnable = isEnabled) }
         }
     }
 
     fun debugSendFakeNotification(context: Context) {
-        viewModelScope.launch {
+        viewModelScope.launch(debugErrorHandler) {
             createFakeNotification(context)
         }
     }
 
     fun debugDropConfetti() {
-        viewModelScope.launch {
+        viewModelScope.launch(debugErrorHandler) {
             actionFlow.emit(Action.DebugConfetti)
         }
     }
 
     fun debugAddFakeMessage() {
-        viewModelScope.launch {
+        viewModelScope.launch(debugErrorHandler) {
             messageRepository.insertMessage(FakeMessage())
+        }
+    }
+
+    fun debugDeleteReceivedMessages() {
+        viewModelScope.launch(debugErrorHandler) {
+            val receivedMessages = messageRepository.getReceivedMessages().first()
+            launch {
+                for (message in receivedMessages) {
+                    messageRepository.deleteMessage(message.messageId)
+                }
+            }
         }
     }
 

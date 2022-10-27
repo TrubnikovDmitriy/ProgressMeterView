@@ -2,9 +2,9 @@ package dv.trubnikov.coolometer.ui.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import androidx.annotation.StringRes
 import dv.trubnikov.coolometer.R
-import android.content.Context
 import dv.trubnikov.coolometer.tools.getNotificationManager
 
 enum class Channel(
