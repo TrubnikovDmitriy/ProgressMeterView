@@ -1,10 +1,14 @@
 package dv.trubnikov.coolometer.ui.screens.main
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
@@ -68,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             fab.setOnClickListener {
                 viewModel.onFabClick()
             }
-            historyFab.setOnClickListener { 
+            historyFab.setOnClickListener {
                 val intent = HistoryActivity.intentForActivity(this@MainActivity)
                 startActivity(intent)
             }
@@ -78,10 +82,10 @@ class MainActivity : AppCompatActivity() {
                     progressMeter.addProgress(score, animate = true)
                 }
             }
-            val debugTaps = listOf(Tap.CENTER, Tap.CENTER, Tap.CENTER)
-            val debugClickListener = SecretClickListener(debugTaps) {
-                showDebugPanel()
-            }
+            val debugTaps = listOf(Tap.TOP, Tap.BOTTOM, Tap.LEFT, Tap.RIGHT)
+            val debugClickListener = SecretClickListener(
+                debugTaps, { showHintForDebugPanel() }, { showDebugPanel() }
+            )
             debugListener.setOnTouchListener(debugClickListener)
         }
     }
@@ -186,6 +190,31 @@ class MainActivity : AppCompatActivity() {
         debugPanel.show(supportFragmentManager, null)
     }
 
+    private fun showHintForDebugPanel() {
+        val startAlpha = 0.5f
+        val hint = viewBinding.layoutContent.debugPanelHint
+        val alpha = ObjectAnimator.ofFloat(hint, View.ALPHA, startAlpha, 0.0f)
+        val scaleX = ObjectAnimator.ofFloat(hint, View.SCALE_X, 1.0f, 1.2f)
+        val scaleY = ObjectAnimator.ofFloat(hint, View.SCALE_Y, 1.0f, 1.2f)
+
+        alpha.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationStart(animation: Animator, isReverse: Boolean) {
+                hint.alpha = startAlpha
+                hint.isVisible = true
+            }
+            override fun onAnimationEnd(animation: Animator) {
+                hint.isVisible = false
+            }
+        })
+
+        val animators = listOf(alpha, scaleX, scaleY)
+        for (animator in animators) {
+            animator.interpolator = DecelerateInterpolator()
+            animator.duration = HINT_DURATION_MS
+            animator.start()
+        }
+    }
+
     private fun checkForNotificationPermissions() {
         if (!checkNotificationPermission(this)) {
             val permissionActivity = PermissionActivity.intentForActivity(this)
@@ -227,6 +256,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val HINT_DURATION_MS = 750L
+
         fun intentForActivity(context: Context): Intent {
             return Intent(context, MainActivity::class.java)
         }
