@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.domain.cloud.CloudTokenProvider
 import dv.trubnikov.coolometer.domain.models.FakeMessage
+import dv.trubnikov.coolometer.domain.models.FirebaseMessage
 import dv.trubnikov.coolometer.domain.models.Message
 import dv.trubnikov.coolometer.domain.parsers.MessageParser
 import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
@@ -105,6 +106,21 @@ class MainViewModel @Inject constructor(
                 onMessageFromNotification(message)
             } else {
                 Timber.i("В интенте нет бандла intent=[$intent]")
+            }
+        }
+    }
+
+    fun onDebugPanelOpen() {
+        viewModelScope.launch(Dispatchers.IO + debugErrorHandler) {
+            if (preferenceRepository.isDebugPanelFirstOpen) {
+                preferenceRepository.isDebugPanelFirstOpen = false
+                val message = FirebaseMessage(
+                    messageId = "first_time_open_debug_panel",
+                    text = "За нахождение дебаг-панели в приложении",
+                    score = +42,
+                    timestamp = System.currentTimeMillis(),
+                )
+                messageRepository.insertMessage(message).getOrThrow()
             }
         }
     }

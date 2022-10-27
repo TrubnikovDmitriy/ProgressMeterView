@@ -32,6 +32,10 @@ class SharedPreferenceRepository @Inject constructor(
         get() = preferences.getBoolean(IS_PERMISSION_REQUESTED_KEY, false)
         set(value) = preferences.edit { putBoolean(IS_PERMISSION_REQUESTED_KEY, value) }
 
+    override var isDebugPanelFirstOpen: Boolean
+        get() = preferences.getBoolean(IS_DEBUG_PANEL_FIRST_OPEN_KEY, true)
+        set(value) = preferences.edit { putBoolean(IS_DEBUG_PANEL_FIRST_OPEN_KEY, value) }
+
     companion object {
         private const val PREFS_NAME = "dv.trubnikov.coolometer.data.preferences.SharedPreferences"
 
@@ -43,5 +47,6 @@ class SharedPreferenceRepository @Inject constructor(
         private const val IS_WIDGET_OFFERED_KEY = "IS_WIDGET_OFFERED_KEY"
         private const val ENABLED_DEBUG_BUTTON_KEY = "ENABLED_DEBUG_BUTTON_KEY"
         private const val IS_PERMISSION_REQUESTED_KEY = "IS_PERMISSION_REQUESTED_KEY"
+        private const val IS_DEBUG_PANEL_FIRST_OPEN_KEY = "IS_DEBUG_PANEL_FIRST_OPEN_KEY"
     }
 }

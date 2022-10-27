@@ -6,4 +6,5 @@ interface PreferenceRepository {
     var isWidgetOffered: Boolean
     var enableDebugButtons: Boolean
     var isPermissionRequested: Boolean
+    var isDebugPanelFirstOpen: Boolean
 }

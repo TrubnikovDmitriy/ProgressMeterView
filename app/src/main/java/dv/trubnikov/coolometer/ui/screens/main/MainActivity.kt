@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
             }
             val debugTaps = listOf(Tap.TOP, Tap.BOTTOM, Tap.LEFT, Tap.RIGHT)
             val debugClickListener = SecretClickListener(
-                debugTaps, { showHintForDebugPanel() }, { showDebugPanel() }
+                debugTaps, { showHintForDebugPanel() }, { openDebugPanel() }
             )
             debugListener.setOnTouchListener(debugClickListener)
         }
@@ -185,7 +185,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showDebugPanel() {
+    private fun openDebugPanel() {
+        viewModel.onDebugPanelOpen()
         val debugPanel = DebugBottomSheet()
         debugPanel.show(supportFragmentManager, null)
     }
