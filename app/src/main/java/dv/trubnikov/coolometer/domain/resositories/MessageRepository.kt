@@ -17,4 +17,6 @@ interface MessageRepository {
     suspend fun deleteMessage(messageId: String): Out<Unit>
 
     suspend fun getTotalScore(): Out<Int>
+
+    fun observeTotalScore(): Flow<Int>
 }

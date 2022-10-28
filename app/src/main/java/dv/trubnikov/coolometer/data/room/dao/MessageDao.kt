@@ -29,4 +29,7 @@ interface MessageDao {
 
     @Query("SELECT IFNULL(SUM(score), 0) FROM messages WHERE is_received=1")
     suspend fun getTotalScore(): Int
+
+    @Query("SELECT IFNULL(SUM(score), 0) FROM messages WHERE is_received=1")
+    fun observeTotalScore(): Flow<Int>
 }

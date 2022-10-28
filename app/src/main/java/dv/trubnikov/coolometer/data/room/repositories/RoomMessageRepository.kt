@@ -14,6 +14,7 @@ import dv.trubnikov.coolometer.tools.getOrThrow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -66,6 +67,10 @@ class RoomMessageRepository @Inject constructor(
         return safeDatabaseRequest(Dispatchers.IO) {
             messageDao.getTotalScore()
         }
+    }
+
+    override fun observeTotalScore(): Flow<Int> {
+        return messageDao.observeTotalScore().distinctUntilChanged()
     }
 
     private suspend fun <R> safeDatabaseRequest(

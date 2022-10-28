@@ -64,6 +64,12 @@ class MainViewModel @Inject constructor(
                 stateFlow.value = createSuccessState(messages)
             }
         }
+        viewModelScope.launch(errorHandler) {
+            messageRepository.observeTotalScore().collect { totalProgress ->
+                updateSuccessState { copy(totalProgress = totalProgress) }
+                updateWidgets()
+            }
+        }
         scheduleWidgetUpdater()
         initializeCloudToken()
         onEntranceToTheApp()
@@ -77,7 +83,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(errorHandler) {
             messageRepository.markAsReceived(message.messageId)
             offerToAddWidgetToHomeScreen(context)
-            updateWidgets()
         }
     }
 
