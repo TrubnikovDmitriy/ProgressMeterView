@@ -35,7 +35,6 @@ import dv.trubnikov.coolometer.ui.screens.permissions.PermissionActivity
 import dv.trubnikov.coolometer.ui.screens.permissions.PermissionActivity.Companion.checkNotificationPermission
 import dv.trubnikov.coolometer.ui.views.ProgressMeterView.OvershootListener
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -166,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                 fab.isVisible = false
             }
             is State.Loading -> {
-                Timber.e("На главном экране $state")
+                // no-op
             }
         }
     }

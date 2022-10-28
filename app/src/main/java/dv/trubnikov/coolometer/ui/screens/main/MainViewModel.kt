@@ -5,12 +5,11 @@ import android.content.ClipData
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dv.trubnikov.coolometer.R
 import dv.trubnikov.coolometer.domain.cloud.CloudTokenProvider
@@ -22,6 +21,7 @@ import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.parse
 import dv.trubnikov.coolometer.domain.parsers.MessageParser.Companion.serialize
 import dv.trubnikov.coolometer.domain.resositories.MessageRepository
 import dv.trubnikov.coolometer.domain.resositories.PreferenceRepository
+import dv.trubnikov.coolometer.domain.workers.RetrieveTokenWorker
 import dv.trubnikov.coolometer.domain.workers.UpdateWidgetWorker
 import dv.trubnikov.coolometer.tools.*
 import dv.trubnikov.coolometer.ui.notifications.Channel
@@ -65,6 +65,7 @@ class MainViewModel @Inject constructor(
             }
         }
         scheduleWidgetUpdater()
+        initializeCloudToken()
         onEntranceToTheApp()
     }
 
@@ -128,10 +129,16 @@ class MainViewModel @Inject constructor(
 
     fun debugCopyToken(context: Context) {
         viewModelScope.launch(debugErrorHandler) {
-            val token = tokenProvider.getToken()
-            val label = context.getString(R.string.debug_panel_copy_token_label)
-            val clip = ClipData.newPlainText(label, token)
-            context.getClipboardManager().setPrimaryClip(clip)
+            val token = withTimeoutOrNull(TOKEN_AWAIT_TIMEOUT_MS) {
+                tokenProvider.getToken()
+            }
+            if (token != null) {
+                val label = context.getString(R.string.debug_panel_copy_token_label)
+                val clip = ClipData.newPlainText(label, token)
+                context.getClipboardManager().setPrimaryClip(clip)
+            } else {
+                Toast.makeText(context, R.string.debug_panel_copy_token_fail, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -289,7 +296,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun scheduleWidgetUpdater() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val widgetUpdater = PeriodicWorkRequestBuilder<UpdateWidgetWorker>(
                 repeatInterval = Duration.ofHours(6)
             ).build()
@@ -297,6 +304,23 @@ class MainViewModel @Inject constructor(
                 WIDGET_UPDATER_WORK,
                 ExistingPeriodicWorkPolicy.KEEP,
                 widgetUpdater
+            )
+        }
+    }
+
+    private fun initializeCloudToken() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+            val retrieveToken = OneTimeWorkRequestBuilder<RetrieveTokenWorker>()
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setConstraints(constraints)
+                .build()
+            workManager.enqueueUniqueWork(
+                TOKEN_RETRIEVE_WORK,
+                ExistingWorkPolicy.KEEP,
+                retrieveToken,
             )
         }
     }
@@ -333,6 +357,8 @@ class MainViewModel @Inject constructor(
 
     companion object {
         private const val WIDGET_UPDATER_WORK = "UpdateWidgetWorker_Periodic"
+        private const val TOKEN_RETRIEVE_WORK = "RetrieveTokenWorker_OneShot"
         private const val WIDGET_OFFER_DELAY_MS = 1_000L
+        private const val TOKEN_AWAIT_TIMEOUT_MS = 1_000L
     }
 }

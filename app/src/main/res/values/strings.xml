@@ -37,6 +37,7 @@
     <string name="debug_panel_delete_fakes">Delete fake message from database</string>
     <string name="debug_panel_copy_token">Copy the token</string>
     <string name="debug_panel_copy_token_label">Token has copied</string>
+    <string name="debug_panel_copy_token_fail">There is no token yet. Check your internet connection</string>
 
     <string name="permissions_rational_title">Get notified!</string>
     <string name="permissions_rational_text">In order to get reminders about your coolness, you should grant permission for notifications</string>

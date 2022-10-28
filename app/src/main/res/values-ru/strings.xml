@@ -39,6 +39,7 @@
     <string name="debug_panel_delete_fakes">Удалить фейковые достижения из базы данных</string>
     <string name="debug_panel_copy_token">Скопировать токен</string>
     <string name="debug_panel_copy_token_label">Токен скопирован</string>
+    <string name="debug_panel_copy_token_fail">Токена ещё нет. Проверь есть ли доступ в интернет</string>
 
     <string name="permissions_rational_title">Будь в курсе!</string>
     <string name="permissions_rational_text">Чтобы получать напоминание о своей крутости, нужно разрешить показ уведомлений</string>
