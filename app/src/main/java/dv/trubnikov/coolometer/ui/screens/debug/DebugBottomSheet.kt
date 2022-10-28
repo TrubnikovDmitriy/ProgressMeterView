@@ -107,6 +107,12 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
         ) { isChecked ->
             preferences.isWidgetOffered = isChecked
         }
+        val isFirstEntrance = DebugItem.Switch(
+            R.string.debug_panel_first_entrance,
+            preferences.isFirstEntrance
+        ) { isChecked ->
+            preferences.isFirstEntrance = isChecked
+        }
         val copyToken = DebugItem.Button(R.string.debug_panel_copy_token, R.drawable.ic_copy) {
             viewModel.debugCopyToken(context)
         }
@@ -117,6 +123,7 @@ class DebugBottomSheet : BottomSheetDialogFragment() {
             enableButtons,
             bigTicksCount,
             smallTicksCount,
+            isFirstEntrance,
             isWidgetOffered,
             truncation,
             deleteFakes,

@@ -65,6 +65,7 @@ class MainViewModel @Inject constructor(
             }
         }
         scheduleWidgetUpdater()
+        onEntranceToTheApp()
     }
 
     fun markAsReceived(context: Context, message: Message) {
@@ -263,6 +264,26 @@ class MainViewModel @Inject constructor(
                 val widgetManager = context.getAppWidgetManager()
                 val widgetComponent = ComponentName(context, ProgressMeterWidget::class.java)
                 widgetManager.requestPinAppWidget(widgetComponent, null, null)
+            }
+        }
+    }
+
+    private fun onEntranceToTheApp() {
+        if (preferenceRepository.isFirstEntrance) {
+            val errorHandler = CoroutineExceptionHandler { _, error ->
+                Timber.e(error, "Не удалось добавить приветственное сообщение")
+                preferenceRepository.isFirstEntrance = true
+                stateFlow.value = State.Error
+            }
+            viewModelScope.launch(errorHandler) {
+                preferenceRepository.isFirstEntrance = false
+                val entranceMessage = FirebaseMessage(
+                    messageId = "first_entrance_id",
+                    text = "Приветственные 150 баллов крутости за былые заслуги",
+                    score = 150,
+                    timestamp = System.currentTimeMillis()
+                )
+                messageRepository.insertMessage(entranceMessage).getOrThrow()
             }
         }
     }

@@ -24,6 +24,10 @@ class SharedPreferenceRepository @Inject constructor(
         get() = preferences.getBoolean(IS_WIDGET_OFFERED_KEY, false)
         set(value) = preferences.edit { putBoolean(IS_WIDGET_OFFERED_KEY, value) }
 
+    override var isFirstEntrance: Boolean
+        get() = preferences.getBoolean(IS_FIRST_ENTRANCE_KEY, true)
+        set(value) = preferences.edit { putBoolean(IS_FIRST_ENTRANCE_KEY, value) }
+
     override var enableDebugButtons: Boolean
         get() = preferences.getBoolean(ENABLED_DEBUG_BUTTON_KEY, false)
         set(value) = preferences.edit { putBoolean(ENABLED_DEBUG_BUTTON_KEY, value) }
@@ -44,6 +48,7 @@ class SharedPreferenceRepository @Inject constructor(
 
         private const val BIG_TICKS_KEY = "BIG_TICKS_KEY"
         private const val SMALL_TICKS_KEY = "SMALL_TICKS_KEY"
+        private const val IS_FIRST_ENTRANCE_KEY = "IS_FIRST_ENTRANCE_KEY"
         private const val IS_WIDGET_OFFERED_KEY = "IS_WIDGET_OFFERED_KEY"
         private const val ENABLED_DEBUG_BUTTON_KEY = "ENABLED_DEBUG_BUTTON_KEY"
         private const val IS_PERMISSION_REQUESTED_KEY = "IS_PERMISSION_REQUESTED_KEY"
